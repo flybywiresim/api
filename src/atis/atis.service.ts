@@ -50,6 +50,10 @@ export class AtisService {
             atis[x.type] = x.datis;
           });
 
+          atis.dep?.toUpperCase();
+          atis.arr?.toUpperCase();
+          atis.combined?.toUpperCase();
+
           return atis;
         }),
         catchError(
@@ -82,7 +86,8 @@ export class AtisService {
             source: 'Vatsim',
             combined: response.clients
               .find(x => x.callsign === icao + '_ATIS').atis_message
-              .replace('^§', ' '),
+              .replace('^§', ' ')
+              .toUpperCase(),
           };
         }),
         catchError(
@@ -120,7 +125,8 @@ export class AtisService {
               .split(':')[35]
               .split('^§')
               .slice(1)
-              .join(' '),
+              .join(' ')
+              .toUpperCase(),
           };
         }),
         catchError(
@@ -140,7 +146,7 @@ export class AtisService {
           return {
             icao,
             source: 'FAA',
-            combined: response.data.text.replace('\n\n', ' '),
+            combined: response.data.text.replace('\n\n', ' ').toUpperCase(),
           };
         }),
         catchError(
