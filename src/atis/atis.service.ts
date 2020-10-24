@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Atis } from './atis.interface';
 
+// TODO: investigate
 // For some reason iconv is not working with import
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const iconv = require('iconv-lite');
@@ -15,19 +16,19 @@ export class AtisService {
   }
 
   getForICAO(icao: string, source?: string): Observable<Atis> {
-    const i = icao.toUpperCase();
-    this.logger.debug(`Searching for ICAO ${i} from source ${source}`);
+    const icaoCode = icao.toUpperCase();
+    this.logger.debug(`Searching for ICAO ${icaoCode} from source ${source}`);
 
     switch (source?.toLowerCase()) {
       case 'faa':
       default:
-        return this.handleFaa(i);
+        return this.handleFaa(icaoCode);
       case 'vatsim':
-        return this.handleVatsim(i);
+        return this.handleVatsim(icaoCode);
       case 'ivao':
-        return this.handleIvao(i);
+        return this.handleIvao(icaoCode);
       case 'pilotedge':
-        return this.handlePilotEdge(i);
+        return this.handlePilotEdge(icaoCode);
     }
   }
 

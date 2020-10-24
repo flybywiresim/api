@@ -15,19 +15,19 @@ export class MetarService {
   }
 
   getForICAO(icao: string, source?: string): Observable<Metar> {
-    const i = icao.toUpperCase();
-    this.logger.debug(`Searching for ICAO ${i} from source ${source}`);
+    const icaoCode = icao.toUpperCase();
+    this.logger.debug(`Searching for ICAO ${icaoCode} from source ${source}`);
 
     switch (source?.toLowerCase()) {
       case 'vatsim':
       default:
-        return this.handleVatsim(i);
+        return this.handleVatsim(icaoCode);
       case 'ms':
-        return this.handleMs(i);
+        return this.handleMs(icaoCode);
       case 'ivao':
-        return this.handleIvao(i);
+        return this.handleIvao(icaoCode);
       case 'pilotedge':
-        return this.handlePilotEdge(i);
+        return this.handlePilotEdge(icaoCode);
     }
   }
 
