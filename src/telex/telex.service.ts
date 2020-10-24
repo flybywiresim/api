@@ -3,10 +3,12 @@ import { Connection, Repository, Transaction, TransactionRepository } from 'type
 import { TelexConnection, TelexConnectionDTO } from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelexMessage, TelexMessageDTO } from './telex-message.entity';
+import * as Filter from 'bad-words';
 
 @Injectable()
 export class TelexService {
   private readonly logger = new Logger(TelexService.name);
+  private readonly messageFilter;
 
   constructor(
     private connection: Connection,
@@ -14,6 +16,7 @@ export class TelexService {
     private readonly connectionRepository: Repository<TelexConnection>,
     @InjectRepository(TelexMessage)
     private readonly messageRepository: Repository<TelexMessage>) {
+    this.messageFilter = new Filter();
   }
 
   // ======= Connection Handling ======= //
@@ -130,7 +133,7 @@ export class TelexService {
     const message: TelexMessage = {
       from: sender,
       to: recipient,
-      message: dto.message,
+      message: this.messageFilter.clean(dto.message),
     };
 
     this.logger.log(`Sending a message from flight with ID '${dto.from}' to flight with number ${dto.to}`);
