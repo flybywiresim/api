@@ -11,8 +11,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelexModule } from './telex/telex.module';
 import { TelexConnection } from './telex/telex-connection.entity';
 import { TelexMessage } from './telex/telex-message.entity';
-import { Connection } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
@@ -21,19 +21,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         store: redisStore,
-        host: configService.get('REDIS_HOST'),
-        port: configService.get<number>('REDIS_PORT'),
+        host: configService.get('redis.host'),
+        port: configService.get<number>('redis.port'),
       }),
       inject: [ConfigService],
     }), TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        host: configService.get('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: 'fbw',
+        host: configService.get('database.host'),
+        port: configService.get<number>('database.port'),
+        username: configService.get('database.username'),
+        password: configService.get('database.password'),
+        database: configService.get('database.database'),
         entities: [TelexConnection, TelexMessage],
         synchronize: true,
         legacySpatialSupport: false,
@@ -43,6 +43,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     TelexModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
     }),
   ],
   controllers: [AppController, MetarController, AtisController, TelexConnectionController],
