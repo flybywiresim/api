@@ -4,7 +4,7 @@ import {
   Injectable, Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Metar } from './metar.interface';
+import { Metar } from './metar.class';
 import { catchError, map, tap } from 'rxjs/operators';
 
 @Injectable()

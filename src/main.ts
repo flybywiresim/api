@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as requestIp from 'request-ip';
 import * as helmet from 'helmet';
@@ -17,6 +18,14 @@ async function bootstrap() {
       max: 100, // limit each IP to 100 requests per windowMs
     }),
   );
+
+  const options = new DocumentBuilder()
+    .setTitle('FlyByWire Simulations API')
+    .setDescription('The FlyByWire Simulations API description')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
 }

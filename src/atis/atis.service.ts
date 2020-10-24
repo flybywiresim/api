@@ -1,7 +1,7 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { Atis } from './atis.interface';
+import { Atis } from './atis.class';
 
 // TODO: investigate
 // For some reason iconv is not working with import

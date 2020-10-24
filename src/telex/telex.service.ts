@@ -1,8 +1,8 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { Connection, Repository, Transaction, TransactionRepository } from 'typeorm';
-import { TelexConnection, TelexConnectionDTO } from './telex-connection.entity';
+import { TelexConnection, TelexConnectionDto } from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TelexMessage, TelexMessageDTO } from './telex-message.entity';
+import { TelexMessage, TelexMessageDto } from './telex-message.entity';
 import * as Filter from 'bad-words';
 import { Cron } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
@@ -45,7 +45,7 @@ export class TelexService {
 
   // ======= Connection Handling ======= //
 
-  async addNewConnection(connection: TelexConnectionDTO, ipAddress: string): Promise<TelexConnection> {
+  async addNewConnection(connection: TelexConnectionDto, ipAddress: string): Promise<TelexConnection> {
     this.logger.log(`Trying to register new flight '${connection.flight}'`);
 
     const existingFlight = await this.connectionRepository.findOne({ flight: connection.flight, isActive: true });
@@ -66,7 +66,7 @@ export class TelexService {
     return await this.connectionRepository.save(newFlight);
   }
 
-  async updateConnection(id: string, connection: TelexConnectionDTO, ipAddress: string): Promise<TelexConnection> {
+  async updateConnection(id: string, connection: TelexConnectionDto, ipAddress: string): Promise<TelexConnection> {
     this.logger.log(`Trying to update flight with ID '${id}'`);
 
     const existingFlight = await this.connectionRepository.findOne({ id, isActive: true, ip: ipAddress });
@@ -137,7 +137,7 @@ export class TelexService {
 
   // ======= Message Handling ======= //
 
-  async sendMessage(dto: TelexMessageDTO, fromIp: string): Promise<TelexMessage> {
+  async sendMessage(dto: TelexMessageDto, fromIp: string): Promise<TelexMessage> {
     this.logger.log(`Trying to send a message from flight with ID '${dto.from}' to flight with number ${dto.to}`);
 
     const sender = await this.getSingleConnection(dto.from, fromIp, true);
@@ -151,7 +151,7 @@ export class TelexService {
     if (!recipient) {
       const message = `Active flight '${dto.to}' does not exist`;
       this.logger.error(message);
-      throw new HttpException(message, 400);
+      throw new HttpException(message, 404);
     }
 
     const message: TelexMessage = {

@@ -1,7 +1,7 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { Taf } from './taf.interface';
+import { Taf } from './taf.class';
 import * as parser from 'fast-xml-parser';
 
 // TODO: investigate
@@ -86,6 +86,6 @@ export class TafService {
 
   private generateNotAvailableException(err: any, icao: string): HttpException {
     this.logger.error(err.message || JSON.stringify(err));
-    throw new HttpException('ATIS not available for ICAO: ' + icao, 404);
+    throw new HttpException('TAF not available for ICAO: ' + icao, 404);
   }
 }

@@ -1,8 +1,10 @@
 import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { MetarService } from './metar.service';
 import { Observable } from 'rxjs';
-import { Metar } from './metar.interface';
+import { Metar } from './metar.class';
+import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('METAR')
 @Controller('metar')
 @UseInterceptors(CacheInterceptor)
 export class MetarController {
@@ -11,6 +13,10 @@ export class MetarController {
 
   @Get(':icao')
   @CacheTTL(240)
+  @ApiParam({name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX'})
+  @ApiQuery({name: 'source', description: 'The source for the METAR', example: 'faa', required: false, enum: ['vatsim', 'ms', 'ivao', 'pilotedge']})
+  @ApiOkResponse({ description: 'METAR notice was found', type: [Metar] })
+  @ApiNotFoundResponse( {description: 'METAR not available for ICAO'})
   getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Observable<Metar> {
     return this.metar.getForICAO(icao, source);
   }
