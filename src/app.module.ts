@@ -12,6 +12,8 @@ import { TelexModule } from './telex/telex.module';
 import { TelexConnection } from './telex/telex-connection.entity';
 import { TelexMessage } from './telex/telex-message.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TafController } from './taf/taf.controller';
+import { TafService } from './taf/taf.service';
 import configuration from './config/configuration';
 
 @Module({
@@ -46,8 +48,8 @@ import configuration from './config/configuration';
       load: [configuration],
     }),
   ],
-  controllers: [AppController, MetarController, AtisController, TelexConnectionController],
-  providers: [AppService, MetarService, AtisService],
+  controllers: [AppController, MetarController, AtisController, TelexConnectionController, TafController],
+  providers: [AppService, MetarService, AtisService, TafService],
 })
 export class AppModule {
 }
