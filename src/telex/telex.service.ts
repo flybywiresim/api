@@ -4,6 +4,8 @@ import { TelexConnection, TelexConnectionDTO } from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelexMessage, TelexMessageDTO } from './telex-message.entity';
 import * as Filter from 'bad-words';
+import { Cron } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TelexService {
@@ -15,8 +17,30 @@ export class TelexService {
     @InjectRepository(TelexConnection)
     private readonly connectionRepository: Repository<TelexConnection>,
     @InjectRepository(TelexMessage)
-    private readonly messageRepository: Repository<TelexMessage>) {
+    private readonly messageRepository: Repository<TelexMessage>,
+    private readonly configService: ConfigService) {
     this.messageFilter = new Filter();
+  }
+
+  @Cron('*/5 * * * * *')
+  private async checkForStaleConnections() {
+    const timeout = this.configService.get<number>('telex.timeoutMin');
+    this.logger.verbose(`Trying to cleanup stale TELEX connections older than ${timeout} minutes`);
+
+    const res = await this.connectionRepository
+      .createQueryBuilder()
+      .select('*')
+      .andWhere(`lastContact < NOW() - INTERVAL ${timeout} MINUTE`)
+      .andWhere('isActive = 1')
+      .getRawMany<TelexConnection>();
+
+    this.logger.verbose(`Found ${res.length} stale connections`);
+
+    res.forEach(async conn => {
+      await this.connectionRepository.update(conn.id, { isActive: false });
+    });
+
+    this.logger.debug(`Set ${res.length} stale connections to inactive`);
   }
 
   // ======= Connection Handling ======= //

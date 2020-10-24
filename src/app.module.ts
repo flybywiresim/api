@@ -15,6 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TafController } from './taf/taf.controller';
 import { TafService } from './taf/taf.service';
 import configuration from './config/configuration';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import configuration from './config/configuration';
         port: configService.get<number>('redis.port'),
       }),
       inject: [ConfigService],
-    }), TypeOrmModule.forRootAsync({
+    }),
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
@@ -47,6 +49,7 @@ import configuration from './config/configuration';
       isGlobal: true,
       load: [configuration],
     }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, MetarController, AtisController, TelexConnectionController, TafController],
   providers: [AppService, MetarService, AtisService, TafService],
