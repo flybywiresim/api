@@ -5,7 +5,7 @@ services:
     container_name: nginx
     restart: unless-stopped
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
       - 443:443
