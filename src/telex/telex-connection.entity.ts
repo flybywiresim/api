@@ -27,12 +27,11 @@ export class TelexConnection {
   @ApiProperty({ description: 'The time of first contact' })
   firstContact?: Date;
 
-  // TODO: Does not work?!
   @UpdateDateColumn()
   @ApiProperty({ description: 'The time of last contact' })
   lastContact?: Date;
 
-  @Column()
+  @Column({ update: false })
   @ApiProperty({ description: 'The flight number', example: 'OS 355' })
   flight: string;
 

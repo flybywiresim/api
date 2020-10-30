@@ -86,9 +86,8 @@ export class TelexService {
     }
 
     this.logger.log(`Updating flight '${existingFlight.flight}'`);
-    existingFlight.location = connection.location;
 
-    await this.connectionRepository.update(existingFlight.id, existingFlight);
+    await this.connectionRepository.update(existingFlight.id, connection);
 
     return await this.connectionRepository.findOne(existingFlight.id);
   }
