@@ -16,6 +16,7 @@ import { TafController } from './taf/taf.controller';
 import { TafService } from './taf/taf.service';
 import configuration from './config/configuration';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FbwNamingStrategy } from './utilities/db-naming';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         entities: [TelexConnection, TelexMessage],
         synchronize: true,
         legacySpatialSupport: false,
+        namingStrategy: new FbwNamingStrategy(),
       }),
       inject: [ConfigService],
     }),
