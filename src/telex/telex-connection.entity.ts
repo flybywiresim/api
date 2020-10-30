@@ -50,6 +50,22 @@ export class TelexConnection {
   })
   @ApiProperty({ description: 'The current location of the aircraft' })
   location: Point;
+
+  @Column()
+  @ApiProperty({ description: 'The altitude above sea level of the aircraft in feet', example: 3500 })
+  trueAltitude: number;
+
+  @Column()
+  @ApiProperty({ description: 'The heading the aircraft in degrees', example: 250.46, minimum: 0, maximum: 360 })
+  heading: number;
+
+  @Column({ nullable: true })
+  @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
+  origin?: string;
+
+  @Column({ nullable: true })
+  @ApiProperty({ description: 'The destination of the flight', example: 'KSFO', required: false })
+  destination?: string;
 }
 
 export class TelexConnectionDto {
@@ -58,4 +74,16 @@ export class TelexConnectionDto {
 
   @ApiProperty({ description: 'The current location of the aircraft' })
   location: Point;
+
+  @ApiProperty({ description: 'The altitude above sea level of the aircraft in feet', example: 3500 })
+  trueAltitude: number;
+
+  @ApiProperty({ description: 'The heading the aircraft in degrees', example: 250.46, minimum: 0, maximum: 360 })
+  heading: number;
+
+  @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
+  origin?: string;
+
+  @ApiProperty({ description: 'The destination of the flight', example: 'KSFO', required: false })
+  destination?: string;
 }

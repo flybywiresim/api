@@ -62,6 +62,10 @@ export class TelexService {
     const newFlight: TelexConnection = {
       flight: connection.flight,
       location: connection.location,
+      trueAltitude: connection.trueAltitude,
+      heading: connection.heading,
+      origin: connection.origin,
+      destination: connection.destination,
     };
 
     this.logger.log(`Registering new flight '${connection.flight}'`);
@@ -87,6 +91,7 @@ export class TelexService {
     // Following properties should not be changeable
     delete existingFlight.flight;
     delete existingFlight.isActive;
+    delete existingFlight.origin;
 
     await this.connectionRepository.update(existingFlight.id, existingFlight);
 
