@@ -1,7 +1,6 @@
 import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule, HttpModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MetarController } from './metar/metar.controller';
 import { MetarService } from './metar/metar.service';
 import { AtisController } from './atis/atis.controller';
@@ -54,7 +53,7 @@ import { FbwNamingStrategy } from './utilities/db-naming';
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController, MetarController, AtisController, TelexConnectionController, TafController],
-  providers: [AppService, MetarService, AtisService, TafService],
+  providers: [MetarService, AtisService, TafService],
 })
 export class AppModule {
 }
