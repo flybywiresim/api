@@ -13,7 +13,7 @@ export class TelexMessage {
   createdAt?: Date;
 
   @Column({ default: false })
-  @ApiProperty({ description: 'Whether teh message has been received' })
+  @ApiProperty({ description: 'Whether the message has been received' })
   received?: boolean;
 
   @Column()
