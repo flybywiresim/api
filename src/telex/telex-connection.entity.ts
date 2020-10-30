@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class Point {
   @ApiProperty({ description: 'The X coordinate' })
@@ -68,22 +69,30 @@ export class TelexConnection {
   destination?: string;
 }
 
-export class TelexConnectionDto {
-  @ApiProperty({ description: 'The flight number', example: 'OS 355' })
-  flight: string;
-
+export class TelexConnectionUpdateDto {
+  @IsNotEmpty()
   @ApiProperty({ description: 'The current location of the aircraft' })
   location: Point;
 
+  @IsNotEmpty()
   @ApiProperty({ description: 'The altitude above sea level of the aircraft in feet', example: 3500 })
   trueAltitude: number;
 
+  @IsNotEmpty()
   @ApiProperty({ description: 'The heading the aircraft in degrees', example: 250.46, minimum: 0, maximum: 360 })
   heading: number;
 
-  @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
-  origin?: string;
-
+  @IsOptional()
   @ApiProperty({ description: 'The destination of the flight', example: 'KSFO', required: false })
   destination?: string;
+}
+
+export class TelexConnectionDto extends TelexConnectionUpdateDto {
+  @IsNotEmpty()
+  @ApiProperty({ description: 'The flight number', example: 'OS 355' })
+  flight: string;
+
+  @IsOptional()
+  @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
+  origin?: string;
 }

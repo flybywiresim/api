@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { TelexConnection } from './telex-connection.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class TelexMessage {
@@ -32,9 +33,11 @@ export class TelexMessage {
 }
 
 export class TelexMessageDto {
+  @IsNotEmpty()
   @ApiProperty({ description: 'The number of the recipient flight', example: 'OS 355' })
   to: string;
 
+  @IsNotEmpty()
   @ApiProperty({ description: 'The message to send', example: 'Hello over there!' })
   message: string;
 }

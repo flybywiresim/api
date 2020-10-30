@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
-import { TelexConnection, TelexConnectionDto } from './telex-connection.entity';
+import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto } from './telex-connection.entity';
 import { TelexService } from './telex.service';
 import {
   ApiBadRequestResponse,
@@ -47,10 +47,10 @@ export class TelexConnectionController {
   @Put()
   @UseGuards(JwtAuthGuard)
   @ApiSecurity('jwt')
-  @ApiBody({ description: 'The updated connection containing the current location', type: TelexConnectionDto })
+  @ApiBody({ description: 'The updated connection containing the current location', type: TelexConnectionUpdateDto })
   @ApiOkResponse({ description: 'The connection got updated', type: TelexConnection })
   @ApiNotFoundResponse({ description: 'The connection with the given ID could not be found' })
-  async updateConnection(@Body() body: TelexConnectionDto, @Request() req): Promise<TelexConnection> {
+  async updateConnection(@Body() body: TelexConnectionUpdateDto, @Request() req): Promise<TelexConnection> {
     return await this.telex.updateConnection(req.user.connectionId, body);
   }
 

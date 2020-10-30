@@ -1,6 +1,6 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { Connection, Repository, Transaction, TransactionRepository } from 'typeorm';
-import { TelexConnection, TelexConnectionDto } from './telex-connection.entity';
+import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto } from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelexMessage, TelexMessageDto } from './telex-message.entity';
 import * as Filter from 'bad-words';
@@ -74,7 +74,7 @@ export class TelexService {
     return this.authService.login(newFlight.flight, newFlight.id);
   }
 
-  async updateConnection(connectionId: string, connection: TelexConnectionDto): Promise<TelexConnection> {
+  async updateConnection(connectionId: string, connection: TelexConnectionUpdateDto): Promise<TelexConnection> {
     this.logger.log(`Trying to update flight with ID '${connectionId}'`);
 
     const existingFlight = await this.connectionRepository.findOne({ id: connectionId, isActive: true });
@@ -87,11 +87,6 @@ export class TelexService {
 
     this.logger.log(`Updating flight '${existingFlight.flight}'`);
     existingFlight.location = connection.location;
-
-    // Following properties should not be changeable
-    delete existingFlight.flight;
-    delete existingFlight.isActive;
-    delete existingFlight.origin;
 
     await this.connectionRepository.update(existingFlight.id, existingFlight);
 
