@@ -18,10 +18,8 @@ services:
     restart: unless-stopped
     environment:
       - DATABASE_HOST=mysql
-      - DATABASE_PORT=3306
       - DATABASE_PASSWORD_FILE=/run/secrets/db_password
       - REDIS_HOST=redis
-      - REDIS_PORT=6379
       - AUTH_SECRET_FILE=/run/secrets/jwt_secret
     depends_on:
       - redis
