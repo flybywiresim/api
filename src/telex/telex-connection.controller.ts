@@ -1,6 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { TelexConnection, TelexConnectionDto } from './telex-connection.entity';
-import { IpAddress } from '../ip-address.decorator';
 import { TelexService } from './telex.service';
 import {
   ApiBadRequestResponse,
@@ -8,9 +7,11 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiParam,
+  ApiParam, ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { Token } from '../auth/token.class';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('TELEX')
 @Controller('txcxn')
@@ -25,35 +26,40 @@ export class TelexConnectionController {
   }
 
   @Get(':id')
-  @ApiParam({name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101'})
+  @ApiParam({ name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101' })
   @ApiOkResponse({ description: 'The connection with the given ID was found', type: TelexConnection })
   @ApiNotFoundResponse({ description: 'The connection with the given ID could not be found' })
-  async getSingleConnection(@Param('id') id: string, @IpAddress() ipAddress): Promise<TelexConnection> {
-    return await this.telex.getSingleConnection(id, ipAddress);
+  async getSingleConnection(@Param('id') id: string): Promise<TelexConnection> {
+    return await this.telex.getSingleConnection(id);
   }
 
   @Post()
-  @ApiBody({ description: 'The new connection containing the flight number and current location', type: TelexConnectionDto })
-  @ApiCreatedResponse({ description: 'The connection got registered', type: TelexConnection })
+  @ApiBody({
+    description: 'The new connection containing the flight number and current location',
+    type: TelexConnectionDto,
+  })
+  @ApiCreatedResponse({ description: 'A flight got created', type: Token })
   @ApiBadRequestResponse({ description: 'An active flight with the given flight number is already in use' })
-  async addNewConnection(@Body() body: TelexConnectionDto, @IpAddress() ipAddress): Promise<TelexConnection> {
-    return await this.telex.addNewConnection(body, ipAddress);
+  async addNewConnection(@Body() body: TelexConnectionDto): Promise<Token> {
+    return await this.telex.addNewConnection(body);
   }
 
-  @Put(':id')
-  @ApiParam({name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101'})
+  @Put()
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('jwt')
   @ApiBody({ description: 'The updated connection containing the current location', type: TelexConnectionDto })
   @ApiOkResponse({ description: 'The connection got updated', type: TelexConnection })
-  @ApiNotFoundResponse({ description: 'The connection with the given ID and IP could not be found' })
-  async updateConnection(@Param('id') id: string, @Body() body: TelexConnectionDto, @IpAddress() ipAddress): Promise<TelexConnection> {
-    return await this.telex.updateConnection(id, body, ipAddress);
+  @ApiNotFoundResponse({ description: 'The connection with the given ID could not be found' })
+  async updateConnection(@Body() body: TelexConnectionDto, @Request() req): Promise<TelexConnection> {
+    return await this.telex.updateConnection(req.user.connectionId, body);
   }
 
-  @Delete(':id')
-  @ApiParam({name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101'})
+  @Delete()
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity('jwt')
   @ApiOkResponse({ description: 'The connection got disabled' })
-  @ApiNotFoundResponse({ description: 'The connection with the given ID and IP could not be found' })
-  async disableConnection(@Param('id') id: string, @IpAddress() ipAddress): Promise<void> {
-    return await this.telex.disableConnection(id, ipAddress);
+  @ApiNotFoundResponse({ description: 'The connection with the given ID could not be found' })
+  async disableConnection(@Request() req): Promise<void> {
+    return await this.telex.disableConnection(req.user.connectionId);
   }
 }

@@ -23,6 +23,11 @@ async function bootstrap() {
     .setTitle('FlyByWire Simulations API')
     .setDescription('The FlyByWire Simulations API description')
     .setVersion('1.0')
+    .addSecurity('jwt', {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

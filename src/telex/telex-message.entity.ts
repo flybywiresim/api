@@ -20,19 +20,18 @@ export class TelexMessage {
   @ApiProperty({ description: 'The message to send', example: 'Hello over there!' })
   message: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => TelexConnection, x => x.id, { eager: true })
   @ApiProperty({ description: 'The sender connection' })
   from: TelexConnection;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => TelexConnection, x => x.id)
   @ApiProperty({ description: 'The recipient connection' })
   to: TelexConnection;
 }
 
 export class TelexMessageDto {
-  @ApiProperty({ description: 'The UUID of the sender flight', example: '6571f19e-21f7-4080-b239-c9d649347101' })
-  from: string;
-
   @ApiProperty({ description: 'The number of the recipient flight', example: 'OS 355' })
   to: string;
 

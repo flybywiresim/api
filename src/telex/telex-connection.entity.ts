@@ -50,10 +50,6 @@ export class TelexConnection {
   })
   @ApiProperty({ description: 'The current location of the aircraft' })
   location: Point;
-
-  @Column()
-  @ApiProperty({ description: 'The IP of the connection', example: '192.168.1.10' })
-  ip: string;
 }
 
 export class TelexConnectionDto {

@@ -6,6 +6,8 @@ import { TelexMessage, TelexMessageDto } from './telex-message.entity';
 import * as Filter from 'bad-words';
 import { Cron } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
+import { AuthService } from '../auth/auth.service';
+import { Token } from '../auth/token.class';
 
 @Injectable()
 export class TelexService {
@@ -18,7 +20,8 @@ export class TelexService {
     private readonly connectionRepository: Repository<TelexConnection>,
     @InjectRepository(TelexMessage)
     private readonly messageRepository: Repository<TelexMessage>,
-    private readonly configService: ConfigService) {
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService) {
     this.messageFilter = new Filter();
   }
 
@@ -45,7 +48,7 @@ export class TelexService {
 
   // ======= Connection Handling ======= //
 
-  async addNewConnection(connection: TelexConnectionDto, ipAddress: string): Promise<TelexConnection> {
+  async addNewConnection(connection: TelexConnectionDto): Promise<Token> {
     this.logger.log(`Trying to register new flight '${connection.flight}'`);
 
     const existingFlight = await this.connectionRepository.findOne({ flight: connection.flight, isActive: true });
@@ -59,20 +62,21 @@ export class TelexService {
     const newFlight: TelexConnection = {
       flight: connection.flight,
       location: connection.location,
-      ip: ipAddress,
     };
 
     this.logger.log(`Registering new flight '${connection.flight}'`);
-    return await this.connectionRepository.save(newFlight);
+    await this.connectionRepository.save(newFlight);
+
+    return this.authService.login(newFlight.flight, newFlight.id);
   }
 
-  async updateConnection(id: string, connection: TelexConnectionDto, ipAddress: string): Promise<TelexConnection> {
-    this.logger.log(`Trying to update flight with ID '${id}'`);
+  async updateConnection(connectionId: string, connection: TelexConnectionDto): Promise<TelexConnection> {
+    this.logger.log(`Trying to update flight with ID '${connectionId}'`);
 
-    const existingFlight = await this.connectionRepository.findOne({ id, isActive: true, ip: ipAddress });
+    const existingFlight = await this.connectionRepository.findOne({ id: connectionId, isActive: true });
 
     if (!existingFlight) {
-      const message = `Active flight with ID '${id}' does not exist with your IP`;
+      const message = `Active flight with ID '${connectionId}' does not exist`;
       this.logger.error(message);
       throw new HttpException(message, 404);
     }
@@ -92,14 +96,10 @@ export class TelexService {
   async getAllActiveConnections(): Promise<TelexConnection[]> {
     this.logger.log('Trying to get all active TELEX connections');
 
-    const conns = await this.connectionRepository.find({ isActive: true });
-
-    conns.forEach(x => TelexService.sanitize(x));
-
-    return conns;
+    return await this.connectionRepository.find({ isActive: true });
   }
 
-  async getSingleConnection(id: string, ipAddress: string, active?: boolean): Promise<TelexConnection> {
+  async getSingleConnection(id: string, active?: boolean): Promise<TelexConnection> {
     this.logger.log(`Trying to get single active TELEX connection with ID '${id}'`);
 
     const conn = await this.connectionRepository.findOne(id);
@@ -109,27 +109,22 @@ export class TelexService {
       throw new HttpException(message, 404);
     }
 
-    // Redact connection if IP is not matching
-    if (ipAddress !== ipAddress) {
-      TelexService.sanitize(conn);
-    }
-
     return conn;
   }
 
-  async disableConnection(id: string, ipAddress: string): Promise<void> {
-    this.logger.log(`Trying to disable TELEX connection with ID '${id}'`);
+  async disableConnection(connectionId: string): Promise<void> {
+    this.logger.log(`Trying to disable TELEX connection with ID '${connectionId}'`);
 
-    const existingFlight = await this.connectionRepository.findOne({ id, isActive: true, ip: ipAddress });
+    const existingFlight = await this.connectionRepository.findOne({ id: connectionId, isActive: true });
 
     if (!existingFlight) {
-      const message = `Active flight with ID '${id}' does not exist with your IP`;
+      const message = `Active flight with ID '${connectionId}' does not exist`;
       this.logger.error(message);
       throw new HttpException(message, 404);
     }
 
 
-    this.logger.log(`Disabling flight with ID '${id}'`);
+    this.logger.log(`Disabling flight with ID '${connectionId}'`);
     existingFlight.isActive = false;
 
     await this.connectionRepository.update(existingFlight.id, existingFlight);
@@ -137,14 +132,14 @@ export class TelexService {
 
   // ======= Message Handling ======= //
 
-  async sendMessage(dto: TelexMessageDto, fromIp: string): Promise<TelexMessage> {
-    this.logger.log(`Trying to send a message from flight with ID '${dto.from}' to flight with number ${dto.to}`);
+  async sendMessage(dto: TelexMessageDto, fromConnectionId: string): Promise<TelexMessage> {
+    this.logger.log(`Trying to send a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
 
-    const sender = await this.getSingleConnection(dto.from, fromIp, true);
+    const sender = await this.getSingleConnection(fromConnectionId, true);
     if (!sender) {
-      const message = `Active flight with ID '${dto.from}' does not exist with your IP`;
+      const message = `Active flight with ID '${fromConnectionId}' does not exist`;
       this.logger.error(message);
-      throw new HttpException(message, 400);
+      throw new HttpException(message, 404);
     }
 
     const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true });
@@ -160,49 +155,32 @@ export class TelexService {
       message: this.messageFilter.clean(dto.message),
     };
 
-    this.logger.log(`Sending a message from flight with ID '${dto.from}' to flight with number ${dto.to}`);
-    const savedMsg = await this.messageRepository.save(message);
-
-    TelexService.sanitize(savedMsg.from);
-    TelexService.sanitize(savedMsg.to);
-
-    return savedMsg;
+    this.logger.log(`Sending a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
+    return await this.messageRepository.save(message);
   }
 
   @Transaction()
-  async fetchMyMessages(id: string,
-                        fromIp: string,
+  async fetchMyMessages(connectionId: string,
                         acknowledge: boolean,
                         @TransactionRepository(TelexMessage) msgRepo?: Repository<TelexMessage>): Promise<TelexMessage[]> {
-    this.logger.log(`Trying to fetch TELEX messages for flight with ID '${id}'`);
+    this.logger.log(`Trying to fetch TELEX messages for flight with ID '${connectionId}'`);
 
-    const recipient = await this.getSingleConnection(id, fromIp, true);
+    const recipient = await this.getSingleConnection(connectionId, true);
 
     const messages = await msgRepo.find({ to: recipient, received: false });
     if (!messages || messages.length === 0) {
-      const message = `No open TELEX messages found for flight with ID '${id}' and your IP`;
+      const message = `No open TELEX messages found for flight with ID '${connectionId}'`;
       this.logger.log(message);
       throw new HttpException(message, 404);
     }
 
     if (acknowledge) {
-      this.logger.log(`Acknowledging all TELEX messages for flight with ID '${id}'`);
+      this.logger.log(`Acknowledging all TELEX messages for flight with ID '${connectionId}'`);
       messages.forEach(x => x.received = true);
       // TODO: Convert to single SQL call
       messages.forEach(async x => await msgRepo.update(x.id, x));
     }
 
-    messages.forEach(x => TelexService.sanitize(x.from));
-
     return messages;
-  }
-
-  private static sanitize(conn: TelexConnection) {
-    if (conn.id) {
-      conn.id = '[REDACTED]';
-    }
-    if (conn.ip) {
-      conn.ip = '[REDACTED]';
-    }
   }
 }

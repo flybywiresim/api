@@ -12,5 +12,9 @@ export default () => ({
   },
   telex: {
     timeoutMin: parseInt(process.env.TELEX_TIMEOUT_MIN) || 6,
+  },
+  auth: {
+    secret: process.env.AUTH_SECRET || 'FlyByWire',
+    expires: process.env.AUTH_EXPIRES || '12h',
   }
 });
