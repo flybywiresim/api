@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigService,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -23,8 +24,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 export class AuthModule {
   private readonly logger = new Logger(AuthModule.name);
 
-  constructor() {
-    if (!process.env.AUTH_SECRET && process.env.NODE_ENV === 'production') {
+  constructor(private readonly configService: ConfigService) {
+    if (configService.get('auth.secret') === 'FlyByWire') {
       this.logger.error('Use a JWT secret in production mode');
       process.exit(99);
     }
