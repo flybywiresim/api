@@ -1,6 +1,12 @@
 import * as fs from 'fs';
+import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
+import * as winston from 'winston';
 
 export default () => ({
+  logger: {
+    level: process.env.LOGGER_LEVEL || 'debug',
+    format: getLoggingFormat(process.env.LOGGER_FORMAT),
+  },
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT) || 3306,
@@ -31,4 +37,16 @@ function envOrFile(envName: string): string {
   }
 
   return "";
+}
+
+function getLoggingFormat(env: string) {
+  switch (env) {
+    case 'json':
+    default:
+      return winston.format.json();
+    case 'splat':
+      return winston.format.splat();
+    case 'nest':
+      return  nestWinstonModuleUtilities.format.nestLike();
+  }
 }

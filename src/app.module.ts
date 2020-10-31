@@ -16,21 +16,23 @@ import { TafService } from './taf/taf.service';
 import configuration from './config/configuration';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FbwNamingStrategy } from './utilities/db-naming';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
-    HttpModule,
     CacheModule.registerAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         store: redisStore,
         host: configService.get('redis.host'),
         port: configService.get<number>('redis.port'),
       }),
-      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
         host: configService.get('database.host'),
@@ -43,14 +45,35 @@ import { FbwNamingStrategy } from './utilities/db-naming';
         legacySpatialSupport: false,
         namingStrategy: new FbwNamingStrategy(),
       }),
-      inject: [ConfigService],
     }),
-    TelexModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
     }),
     ScheduleModule.forRoot(),
+    WinstonModule.forRootAsync({
+      imports: [ConfigService],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          levels: {
+            error: 0,
+            warn: 1,
+            log: 2,
+            info: 3,
+            debug: 4,
+            verbose: 5,
+          },
+          level: configService.get('logger.level'),
+          format: configService.get('logger.format'),
+          transports: [
+            new winston.transports.Console(),
+          ]
+        };
+      },
+    }),
+    TelexModule,
+    HttpModule,
   ],
   controllers: [AppController, MetarController, AtisController, TelexConnectionController, TafController],
   providers: [MetarService, AtisService, TafService],
