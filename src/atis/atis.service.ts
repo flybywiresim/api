@@ -87,7 +87,7 @@ export class AtisService {
             source: 'Vatsim',
             combined: response.clients
               .find(x => x.callsign === icao + '_ATIS').atis_message
-              .replace('^§', ' ')
+              .replace(/\^§/g, ' ')
               .toUpperCase(),
           };
         }),
