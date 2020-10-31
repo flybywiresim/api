@@ -59,10 +59,9 @@ import * as winston from 'winston';
           levels: {
             error: 0,
             warn: 1,
-            log: 2,
-            info: 3,
-            debug: 4,
-            verbose: 5,
+            info: 2,
+            debug: 3,
+            verbose: 4,
           },
           level: configService.get('logger.level'),
           format: configService.get('logger.format'),
