@@ -198,9 +198,12 @@ export class TelexService {
 
     if (acknowledge) {
       this.logger.log(`Acknowledging all TELEX messages for flight with ID '${connectionId}'`);
-      messages.forEach(x => x.received = true);
-      // TODO: Convert to single SQL call
-      messages.forEach(async x => await msgRepo.update(x.id, x));
+
+      await msgRepo.createQueryBuilder('message')
+        .update()
+        .set({ received: true })
+        .where('id IN (:ids)', { ids: messages.map(m => m.id) })
+        .execute();
     }
 
     messages.forEach(msg => {
