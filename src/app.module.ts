@@ -44,6 +44,7 @@ import * as winston from 'winston';
         synchronize: true,
         legacySpatialSupport: false,
         namingStrategy: new FbwNamingStrategy(),
+        logging: configService.get('database.logging'),
       }),
     }),
     ConfigModule.forRoot({
