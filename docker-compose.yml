@@ -13,7 +13,7 @@ services:
       - 443:443
 
   fbw_api:
-    image: nistei/fbw-api:latest
+    image: ghcr.io/flybywiresim/api:latest
     container_name: fbw_api
     restart: unless-stopped
     environment:
