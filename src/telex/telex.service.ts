@@ -33,20 +33,24 @@ export class TelexService {
     const timeout = this.configService.get<number>('telex.timeoutMin');
     this.logger.verbose(`Trying to cleanup stale TELEX connections older than ${timeout} minutes`);
 
-    const res = await this.connectionRepository
+    const connections = await this.connectionRepository
       .createQueryBuilder()
       .select('*')
       .andWhere(`lastContact < NOW() - INTERVAL ${timeout} MINUTE`)
       .andWhere('isActive = 1')
       .getRawMany<TelexConnection>();
 
-    this.logger.verbose(`Found ${res.length} stale connections`);
+    this.logger.verbose(`Found ${connections.length} stale connections`);
 
-    res.forEach(async conn => {
-      await this.connectionRepository.update(conn.id, { isActive: false });
-    });
+    if (connections.length > 0) {
+      await this.connectionRepository.createQueryBuilder('connection')
+        .update()
+        .set({ isActive: false })
+        .where('id IN (:ids)', { ids: connections.map(m => m.id) })
+        .execute();
+    }
 
-    this.logger.debug(`Set ${res.length} stale connections to inactive`);
+    this.logger.debug(`Set ${connections.length} stale connections to inactive`);
   }
 
   // ======= Connection Handling ======= //
