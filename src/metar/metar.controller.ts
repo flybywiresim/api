@@ -15,7 +15,7 @@ export class MetarController {
   @CacheTTL(240)
   @ApiParam({name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX'})
   @ApiQuery({name: 'source', description: 'The source for the METAR', example: 'vatsim', required: false, enum: ['vatsim', 'ms', 'ivao', 'pilotedge']})
-  @ApiOkResponse({ description: 'METAR notice was found', type: [Metar] })
+  @ApiOkResponse({ description: 'METAR notice was found', type: Metar })
   @ApiNotFoundResponse( {description: 'METAR not available for ICAO'})
   getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Observable<Metar> {
     return this.metar.getForICAO(icao, source);

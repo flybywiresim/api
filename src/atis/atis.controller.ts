@@ -15,7 +15,7 @@ export class AtisController {
   @CacheTTL(120)
   @ApiParam({name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX'})
   @ApiQuery({name: 'source', description: 'The source for the ICAO', example: 'faa', required: false, enum: ['faa', 'vatsim', 'ivao', 'pilotedge']})
-  @ApiOkResponse({ description: 'ATIS notice was found', type: [Atis] })
+  @ApiOkResponse({ description: 'ATIS notice was found', type: Atis })
   @ApiNotFoundResponse( {description: 'ATIS not available for ICAO'})
   getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Observable<Atis> {
     return this.atis.getForICAO(icao, source);
