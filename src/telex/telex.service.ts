@@ -8,6 +8,7 @@ import { Cron } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { Token } from '../auth/token.class';
+import { BannedFlightNumbers } from './banned-flight-numbers';
 
 @Injectable()
 export class TelexService {
@@ -51,12 +52,18 @@ export class TelexService {
   async addNewConnection(connection: TelexConnectionDto): Promise<Token> {
     this.logger.log(`Trying to register new flight '${connection.flight}'`);
 
+    if (BannedFlightNumbers.includes(connection.flight.toUpperCase())) {
+      const message = `User tried to use banned flight number: '${connection.flight}'`;
+      this.logger.log(message);
+      throw new HttpException(message, 400);
+    }
+
     const existingFlight = await this.connectionRepository.findOne({ flight: connection.flight, isActive: true });
 
     if (existingFlight) {
       const message = `An active flight with the number '${connection.flight}' is already in use`;
       this.logger.error(message);
-      throw new HttpException(message, 400);
+      throw new HttpException(message, 409);
     }
 
     const newFlight: TelexConnection = {
