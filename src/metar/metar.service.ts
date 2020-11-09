@@ -37,6 +37,10 @@ export class MetarService {
       .pipe(
         tap(response => this.logger.debug(`Response status ${response.status} for Vatsim METAR request`)),
         map(response => {
+          if (!response.data) {
+            throw this.generateNotAvailableException('Empty response', icao);
+          }
+
           return { icao: icao, metar: response.data, source: 'Vatsim' };
         }),
         catchError(
