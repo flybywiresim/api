@@ -8,7 +8,7 @@ import { Cron } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { Token } from '../auth/token.class';
-import { BannedFlightNumbers } from './banned-flight-numbers';
+import { BannedFlightNumbers, MessageFilters } from './filters';
 
 @Injectable()
 export class TelexService {
@@ -24,6 +24,7 @@ export class TelexService {
     private readonly configService: ConfigService,
     private readonly authService: AuthService) {
     this.messageFilter = new Filter();
+    this.messageFilter.addWords(...MessageFilters);
   }
 
   @Cron('*/5 * * * * *')
@@ -158,7 +159,8 @@ export class TelexService {
     const message: TelexMessage = {
       from: sender,
       to: recipient,
-      message: this.messageFilter.clean(dto.message),
+      message: dto.message,
+      isProfane: this.messageFilter.isProfane(dto.message),
     };
 
     this.logger.log(`Sending a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
@@ -186,6 +188,10 @@ export class TelexService {
       // TODO: Convert to single SQL call
       messages.forEach(async x => await msgRepo.update(x.id, x));
     }
+
+    messages.forEach(msg => {
+      msg.message = this.messageFilter.clean(msg.message);
+    });
 
     return messages;
   }

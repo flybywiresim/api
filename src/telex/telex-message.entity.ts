@@ -21,6 +21,10 @@ export class TelexMessage {
   @ApiProperty({ description: 'The message to send', example: 'Hello over there!' })
   message: string;
 
+  @Column()
+  @ApiProperty({ description: 'Whether the message contains profanity and got filtered' })
+  isProfane: boolean;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne(type => TelexConnection, x => x.id, { eager: true })
   @ApiProperty({ description: 'The sender connection' })
