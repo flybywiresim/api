@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { Token } from '../auth/token.class';
 import { BannedFlightNumbers, MessageFilters } from './filters';
+import { Paginated, PaginationDto } from 'src/common/Pagination';
 
 @Injectable()
 export class TelexService {
@@ -100,10 +101,16 @@ export class TelexService {
     return await this.connectionRepository.findOne(existingFlight.id);
   }
 
-  async getAllActiveConnections(): Promise<TelexConnection[]> {
-    this.logger.log('Trying to get all active TELEX connections');
+  async getActiveConnections(pagination: PaginationDto): Promise<Paginated<TelexConnection>> {
+    this.logger.log(`Trying to get ${pagination.take} TELEX connections, skipped ${pagination.skip}`);
 
-    return await this.connectionRepository.find({ isActive: true });
+    const [data, total] = await this.connectionRepository.findAndCount({ ...pagination, where: { isActive: true } });
+
+    return {
+      data,
+      count: data.length,
+      total
+    }
   }
 
   async getSingleConnection(id: string, active?: boolean): Promise<TelexConnection> {
@@ -169,8 +176,8 @@ export class TelexService {
 
   @Transaction()
   async fetchMyMessages(connectionId: string,
-                        acknowledge: boolean,
-                        @TransactionRepository(TelexMessage) msgRepo?: Repository<TelexMessage>): Promise<TelexMessage[]> {
+    acknowledge: boolean,
+    @TransactionRepository(TelexMessage) msgRepo?: Repository<TelexMessage>): Promise<TelexMessage[]> {
     this.logger.log(`Trying to fetch TELEX messages for flight with ID '${connectionId}'`);
 
     const recipient = await this.getSingleConnection(connectionId, true);
