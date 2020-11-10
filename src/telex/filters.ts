@@ -6,3 +6,6 @@ export const BannedFlightNumbers = [
   'UA93',
   'UA175',
 ];
+
+export const MessageFilters = [
+];
