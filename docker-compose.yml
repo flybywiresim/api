@@ -53,6 +53,21 @@ services:
     expose:
       - 3306
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-worldmap-panel
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_DATABASE=fbw
+      - DATABASE_USER=fbw
+    volumes:
+      - ./grafana:/etc/grafana
+    expose:
+      - 5000
+
 secrets:
   db_password:
     file: secrets/db_password.txt
