@@ -1,3 +1,7 @@
+# Import disabled for now.
+# Imported dashboards sometimes freeze the UI.
+# If eventually solved we can import.
+
 #apiVersion: 1
 #
 #providers:
@@ -5,6 +9,4 @@
 #    type: file
 #    options:
 #      path:  /etc/grafana/dashboards/active_flights.json
-#        # Default path for Windows: C:/Program Files/GrafanaLabs/grafana/public/dashboards
-#      # Default path for Linux is: /var/lib/grafana/dashboards
 #
