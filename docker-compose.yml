@@ -1,22 +1,38 @@
 version: "3.3"
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    restart: unless-stopped
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    environment:
+      - DHPARAM_GENERATION=false
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - /etc/letsencrypt/live/api.flybywiresim.com/fullchain.pem:/etc/ssl/fullchain.pem
-      - /etc/letsencrypt/live/api.flybywiresim.com/privkey.pem:/etc/ssl/privkey.pem
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx-certificates:/etc/nginx/certs
+      - nginx-vhosts:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
     ports:
       - 80:80
       - 443:443
+
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-proxy-letsencrypt
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx-certificates:/etc/nginx/certs
+      - nginx-vhosts:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
 
   fbw_api:
     image: nistei/fbw-api:latest
     container_name: fbw_api
     restart: unless-stopped
     environment:
+      - VIRTUAL_HOST=${API_URL}
+      - LETSENCRYPT_HOST=${API_URL}
+      - VIRTUAL_PORT=3000
       - DATABASE_HOST=mysql
       - DATABASE_PASSWORD_FILE=/run/secrets/db_password
       - REDIS_HOST=redis
@@ -58,6 +74,9 @@ services:
     container_name: grafana
     restart: unless-stopped
     environment:
+      - VIRTUAL_HOST=${MAP_URL}
+      - LETSENCRYPT_HOST=${MAP_URL}
+      - VIRTUAL_PORT=3000
       - GF_INSTALL_PLUGINS=grafana-worldmap-panel
       - DATABASE_HOST=mysql
       - DATABASE_PORT=3306
@@ -67,6 +86,11 @@ services:
       - ./grafana:/etc/grafana
     expose:
       - 5000
+
+volumes:
+  nginx-certificates:
+  nginx-vhosts:
+  nginx-html:
 
 secrets:
   db_password:
