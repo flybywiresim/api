@@ -19,20 +19,6 @@ createSecrets() {
   echo "Secrets created"
 }
 
-runServicesProd() {
-  echo "Starting services"
-
-  docker-compose pull
-  docker-compose up -d --remove-orphans
-}
-
-runServicesDev() {
-  echo "Starting development services"
-
-  docker-compose pull
-  docker-compose -f docker-compose.dev.yml up -d --remove-orphans
-}
-
 checkDocker() {
   echo "Checking if docker is installed"
   if ! command -v docker
@@ -51,11 +37,4 @@ checkDocker() {
 
 checkDocker
 createSecrets
-
-if [ "$1" == "prod" ]
-then
-  runServicesProd
-else
-  runServicesDev
-fi
 

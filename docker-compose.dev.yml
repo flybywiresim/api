@@ -1,15 +1,5 @@
 version: "3.3"
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    restart: unless-stopped
-    volumes:
-      - ./nginx.dev.conf:/etc/nginx/nginx.conf
-    ports:
-      - 80:80
-      - 443:443
-
   redis:
     image: redis:latest
     container_name: redis
@@ -32,6 +22,21 @@ services:
       - db_password
     ports:
       - 3306:3306
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-worldmap-panel
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_DATABASE=fbw
+      - DATABASE_USER=fbw
+    volumes:
+      - ./grafana:/etc/grafana
+    ports:
+      - 8000:3000
 
 secrets:
   db_password:

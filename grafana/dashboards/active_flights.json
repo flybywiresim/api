@@ -1,0 +1,408 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "circleMaxSize": "2",
+      "circleMinSize": 2,
+      "colors": [
+        "rgba(245, 54, 54, 0.9)",
+        "rgba(237, 129, 40, 0.89)",
+        "rgba(50, 172, 45, 0.97)"
+      ],
+      "datasource": null,
+      "decimals": 0,
+      "esMetric": "Count",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 23,
+        "w": 13,
+        "x": 0,
+        "y": 0
+      },
+      "hideEmpty": false,
+      "hideZero": false,
+      "id": 2,
+      "initialZoom": "2",
+      "locationData": "table",
+      "mapCenter": "(0°, 0°)",
+      "mapCenterLatitude": 0,
+      "mapCenterLongitude": 0,
+      "maxDataPoints": 1,
+      "mouseWheelZoom": true,
+      "pluginVersion": "7.3.2",
+      "showLegend": false,
+      "stickyLabels": true,
+      "tableQueryOptions": {
+        "geohashField": "geohash",
+        "labelField": "flight",
+        "latitudeField": "latitude",
+        "longitudeField": "longitude",
+        "metricField": "Altitude",
+        "queryType": "coordinates"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  lastContact AS \"time\",\r\n  trueAltitude AS \"Altitude\",\r\n  ST_Y(location) AS \"latitude\",\r\n  ST_X(location) AS \"longitude\",\r\n  flight\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY firstContact",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "trueAltitude"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telex_connection",
+          "timeColumn": "firstContact",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": "0,10",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Live Map",
+      "type": "grafana-worldmap-panel",
+      "unitPlural": "feet",
+      "unitSingle": "",
+      "unitSingular": "foot",
+      "valueName": "current"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 13,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "/^count\\(\\*\\)$/",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.2",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  count(*),\r\n  $__timeTo() AS \"time\"\r\nFROM telex_connection\r\nWHERE\r\n  $__timeFilter(lastContact)\r\nAND\r\n  isActive = '1'\r\nORDER BY lastContact",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "trueAltitude"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telex_connection",
+          "timeColumn": "firstContact",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Current Active Flights",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 16,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Count$/",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "7.3.2",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  $__timeGroupAlias(createdAt,$__interval),\r\n  count(*) AS \"Count\"\r\nFROM telex_message\r\nWHERE\r\n  $__timeFilter(createdAt)\r\nGROUP BY 1\r\nORDER BY $__timeGroup(createdAt,$__interval)",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "trueAltitude"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telex_connection",
+          "timeColumn": "firstContact",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Messages sent in the last hour",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 19,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "content": "<img src=\"https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg\"/>",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.2",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "rawSql": "SELECT\n  firstContact AS \"time\",\n  trueAltitude\nFROM telex_connection\nWHERE\n  $__timeFilter(firstContact)\nORDER BY firstContact",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "trueAltitude"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telex_connection",
+          "timeColumn": "firstContact",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 11,
+        "x": 13,
+        "y": 3
+      },
+      "id": 10,
+      "options": {
+        "showHeader": true
+      },
+      "pluginVersion": "7.3.2",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  ST_Y(location) AS \"Latitude\",\r\n  ST_X(location) AS \"Longitude\",\r\n  DATE_FORMAT(firstContact, \"%H:%iZ\") AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY lastContact",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "trueAltitude"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telex_connection",
+          "timeColumn": "firstContact",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Active Connections",
+      "type": "table"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true
+  },
+  "timezone": "",
+  "title": "FlyByWire Simulations",
+  "uid": "pdcMW6hMk",
+  "version": 4
+}
