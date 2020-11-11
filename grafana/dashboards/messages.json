@@ -15,73 +15,74 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
-      "circleMaxSize": "2",
-      "circleMinSize": 2,
-      "colors": [
-        "#73BF69",
-        "#73BF69"
-      ],
       "datasource": null,
-      "decimals": 0,
-      "esMetric": "Count",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 22,
-        "w": 12,
+        "h": 6,
+        "w": 6,
         "x": 0,
         "y": 0
       },
-      "hideEmpty": false,
-      "hideZero": false,
-      "id": 2,
-      "initialZoom": "2",
-      "locationData": "table",
-      "mapCenter": "(0°, 0°)",
-      "mapCenterLatitude": 0,
-      "mapCenterLongitude": 0,
-      "maxDataPoints": 1,
-      "mouseWheelZoom": true,
-      "pluginVersion": "7.3.2",
-      "showLegend": false,
-      "stickyLabels": true,
-      "tableQueryOptions": {
-        "geohashField": "geohash",
-        "labelField": "flight",
-        "latitudeField": "latitude",
-        "longitudeField": "longitude",
-        "metricField": "Altitude",
-        "queryType": "coordinates"
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
+      "pluginVersion": "7.3.2",
       "targets": [
         {
           "format": "table",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  lastContact AS \"time\",\r\n  trueAltitude AS \"Altitude\",\r\n  ST_Y(location) AS \"latitude\",\r\n  ST_X(location) AS \"longitude\",\r\n  flight\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY firstContact",
+          "rawSql": "SELECT\r\n  count(*) AS \"Count\"\r\nFROM telex_message\r\nWHERE\r\n  $__timeFilter(createdAt)",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "trueAltitude"
+                  "isProfane"
                 ],
                 "type": "column"
               }
             ]
           ],
-          "table": "telex_connection",
-          "timeColumn": "firstContact",
-          "timeColumnType": "timestamp",
+          "table": "telex_message",
+          "timeColumn": "createdAt",
+          "timeColumnType": "datetime",
           "where": [
             {
               "name": "$__timeFilter",
@@ -91,15 +92,10 @@
           ]
         }
       ],
-      "thresholds": "0",
       "timeFrom": null,
       "timeShift": null,
-      "title": "Live Map",
-      "type": "grafana-worldmap-panel",
-      "unitPlural": "feet",
-      "unitSingle": "",
-      "unitSingular": "foot",
-      "valueName": "current"
+      "title": "Messages Sent",
+      "type": "stat"
     },
     {
       "datasource": null,
@@ -124,22 +120,22 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 12,
+        "h": 6,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
-      "id": 4,
+      "id": 7,
       "options": {
         "colorMode": "value",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "last"
+            "mean"
           ],
-          "fields": "/^count\\(\\*\\)$/",
+          "fields": "",
           "values": false
         },
         "textMode": "auto"
@@ -147,25 +143,25 @@
       "pluginVersion": "7.3.2",
       "targets": [
         {
-          "format": "time_series",
+          "format": "table",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  count(*),\r\n  $__timeTo() AS \"time\"\r\nFROM telex_connection\r\nWHERE\r\n  $__timeFilter(lastContact)\r\nAND\r\n  isActive = '1'\r\nORDER BY lastContact",
+          "rawSql": "SELECT\r\n  count(*) AS \"Count\"\r\nFROM telex_message\r\nWHERE\r\n  $__timeFilter(createdAt)\r\nAND\r\n  received = 1",
           "refId": "A",
           "select": [
             [
               {
                 "params": [
-                  "trueAltitude"
+                  "isProfane"
                 ],
                 "type": "column"
               }
             ]
           ],
-          "table": "telex_connection",
-          "timeColumn": "firstContact",
-          "timeColumnType": "timestamp",
+          "table": "telex_message",
+          "timeColumn": "createdAt",
+          "timeColumnType": "datetime",
           "where": [
             {
               "name": "$__timeFilter",
@@ -177,11 +173,12 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Active flights",
+      "title": "Messages Received",
       "type": "stat"
     },
     {
       "datasource": null,
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -203,30 +200,155 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 174
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Contains profanity"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 132
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 16,
+        "h": 23,
+        "w": 12,
+        "x": 12,
         "y": 0
       },
-      "id": 6,
+      "id": 4,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "/^Count$/",
-          "values": false
-        },
-        "textMode": "auto"
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Time"
+          }
+        ]
       },
       "pluginVersion": "7.3.2",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  createdAt AS \"Time\",\n  isProfane AS \"Contains profanity\",\n  REPLACE(message, ';', ' ') AS \"Message\"\nFROM telex_message\nWHERE\n  $__timeFilter(createdAt)\nORDER BY createdAt",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "isProfane"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "isProfane"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "telex_message",
+          "timeColumn": "createdAt",
+          "timeColumnType": "datetime",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Messages",
+      "type": "table"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.2",
+      "pointradius": 1,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": true,
       "targets": [
         {
           "format": "time_series",
@@ -257,152 +379,48 @@
           ]
         }
       ],
+      "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
-      "title": "Messages sent in the past week",
-      "type": "stat"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
+      "title": "Message Rate",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 20,
-        "y": 0
-      },
-      "id": 8,
-      "links": [
         {
-          "targetBlank": true,
-          "title": "GitHub",
-          "url": "https://github.com/flybywiresim/a32nx"
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
         }
       ],
-      "options": {
-        "content": "<img src=\"https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg\"/>",
-        "mode": "html"
-      },
-      "pluginVersion": "7.3.2",
-      "targets": [
-        {
-          "format": "time_series",
-          "group": [],
-          "metricColumn": "none",
-          "rawQuery": false,
-          "rawSql": "SELECT\n  firstContact AS \"time\",\n  trueAltitude\nFROM telex_connection\nWHERE\n  $__timeFilter(firstContact)\nORDER BY firstContact",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "trueAltitude"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "telex_connection",
-          "timeColumn": "firstContact",
-          "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "",
-      "type": "text"
-    },
-    {
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": null,
-            "filterable": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 19,
-        "w": 12,
-        "x": 12,
-        "y": 3
-      },
-      "id": 10,
-      "options": {
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": false,
-            "displayName": "Flight"
-          }
-        ]
-      },
-      "pluginVersion": "7.3.2",
-      "targets": [
-        {
-          "format": "table",
-          "group": [],
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  ST_Y(location) AS \"Latitude\",\r\n  ST_X(location) AS \"Longitude\",\r\n  DATE_FORMAT(firstContact, \"%H:%iZ\") AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY lastContact",
-          "refId": "A",
-          "select": [
-            [
-              {
-                "params": [
-                  "trueAltitude"
-                ],
-                "type": "column"
-              }
-            ]
-          ],
-          "table": "telex_connection",
-          "timeColumn": "firstContact",
-          "timeColumnType": "timestamp",
-          "where": [
-            {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
-            }
-          ]
-        }
-      ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Active Flights",
-      "type": "table"
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     }
   ],
-  "refresh": "10s",
   "schemaVersion": 26,
   "style": "dark",
   "tags": [],
@@ -413,11 +431,9 @@
     "from": "now-7d",
     "to": "now"
   },
-  "timepicker": {
-    "hidden": true
-  },
+  "timepicker": {},
   "timezone": "",
-  "title": "FlyByWire Simulations",
-  "uid": "U2f2I6hMk",
-  "version": 7
+  "title": "Telex Messages",
+  "uid": "vEvCNehMz",
+  "version": 2
 }
