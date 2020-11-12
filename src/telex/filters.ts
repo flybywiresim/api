@@ -10,6 +10,9 @@ export const BannedFlightNumbers = [
   'MH370',
   'UA93',
   'UA175',
+  'AF447',
+  'MSR990',
+  'MSR804',
 ];
 
 export const MessageFilters = [
