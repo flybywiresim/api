@@ -84,14 +84,14 @@ export class TelexConnectionUpdateDto {
   @IsOptional()
   @ApiProperty({ description: 'The destination of the flight', example: 'KSFO', required: false })
   destination?: string;
+
+  @IsOptional()
+  @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
+  origin?: string;
 }
 
 export class TelexConnectionDto extends TelexConnectionUpdateDto {
   @IsNotEmpty()
   @ApiProperty({ description: 'The flight number', example: 'OS 355' })
   flight: string;
-
-  @IsOptional()
-  @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
-  origin?: string;
 }
