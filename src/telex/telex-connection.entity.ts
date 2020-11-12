@@ -59,6 +59,10 @@ export class TelexConnection {
   @ApiProperty({ description: 'The heading the aircraft in degrees', example: 250.46, minimum: 0, maximum: 360 })
   heading: number;
 
+  @Column()
+  @ApiProperty({ description: 'Whether the user wants to receive freetext messages', example: true })
+  freetextEnabled: boolean;
+
   @Column({ nullable: true })
   @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
   origin?: string;
@@ -80,6 +84,13 @@ export class TelexConnectionUpdateDto {
   @IsNotEmpty()
   @ApiProperty({ description: 'The heading the aircraft in degrees', example: 250.46, minimum: 0, maximum: 360 })
   heading: number;
+
+  // Set it to true to support the old MCDU implementation (0.4.1)
+  // 0.4.1 does this check in the frontend
+  // TODO: Remove the default value after 0.5.0 release
+  @IsOptional()
+  @ApiProperty({ description: 'Whether the user wants to receive freetext messages', example: true })
+  freetextEnabled = true;
 
   @IsOptional()
   @ApiProperty({ description: 'The destination of the flight', example: 'KSFO', required: false })
