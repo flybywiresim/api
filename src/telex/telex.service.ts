@@ -67,14 +67,7 @@ export class TelexService {
       throw new HttpException(message, 409);
     }
 
-    const newFlight: TelexConnection = {
-      flight: connection.flight,
-      location: connection.location,
-      trueAltitude: connection.trueAltitude,
-      heading: connection.heading,
-      origin: connection.origin,
-      destination: connection.destination,
-    };
+    const newFlight: TelexConnection = {...connection};
 
     this.logger.log(`Registering new flight '${connection.flight}'`);
     await this.connectionRepository.save(newFlight);
@@ -149,7 +142,7 @@ export class TelexService {
       throw new HttpException(message, 404);
     }
 
-    const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true });
+    const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true, freetextEnabled: true });
     if (!recipient) {
       const message = `Active flight '${dto.to}' does not exist`;
       this.logger.error(message);
