@@ -13,9 +13,3 @@ export class PaginationDto {
     @IsInt()
     skip = 0;
 }
-
-export interface Paginated<T> {
-    data: T[];
-    count: number;
-    total: number;
-}

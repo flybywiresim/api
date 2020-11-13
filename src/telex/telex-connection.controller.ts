@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards, ValidationPipe } from '@nestjs/common';
-import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto } from './telex-connection.entity';
+import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
 import { TelexService } from './telex.service';
 import {
   ApiBadRequestResponse,
@@ -12,7 +12,8 @@ import {
 } from '@nestjs/swagger';
 import { Token } from '../auth/token.class';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Paginated, PaginationDto } from 'src/common/Pagination';
+import { PaginationDto } from 'src/common/Pagination';
+
 @ApiTags('TELEX')
 @Controller('txcxn')
 export class TelexConnectionController {
@@ -20,10 +21,10 @@ export class TelexConnectionController {
   }
 
   @Get()
-  @ApiOkResponse({ description: 'All active TELEX connections', type: [TelexConnection] })
+  @ApiOkResponse({ description: 'The paginated list of connections', type: TelexConnectionPaginatedDto })
   @ApiQuery({ name: 'take', type: Number, required: false, description: 'The number of connections to take', schema: { maximum: 25, minimum: 0, default: 25 } })
   @ApiQuery({ name: 'skip', type: Number, required: false, description: 'The number of connections to skip', schema: { minimum: 0, default: 0 } })
-  async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto): Promise<Paginated<TelexConnection>> {
+  async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
     return await this.telex.getActiveConnections(pagination);
   }
 

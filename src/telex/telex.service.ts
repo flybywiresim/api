@@ -1,6 +1,6 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { Connection, Repository, Transaction, TransactionRepository } from 'typeorm';
-import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto } from './telex-connection.entity';
+import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelexMessage, TelexMessageDto } from './telex-message.entity';
 import * as Filter from 'bad-words';
@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { Token } from '../auth/token.class';
 import { BannedFlightNumbers, MessageFilters } from './filters';
-import { Paginated, PaginationDto } from 'src/common/Pagination';
+import { PaginationDto } from 'src/common/Pagination';
 
 @Injectable()
 export class TelexService {
@@ -101,14 +101,14 @@ export class TelexService {
     return await this.connectionRepository.findOne(existingFlight.id);
   }
 
-  async getActiveConnections(pagination: PaginationDto): Promise<Paginated<TelexConnection>> {
+  async getActiveConnections(pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
     this.logger.log(`Trying to get ${pagination.take} TELEX connections, skipped ${pagination.skip}`);
 
-    const [data, total] = await this.connectionRepository.findAndCount({ ...pagination, where: { isActive: true } });
+    const [results, total] = await this.connectionRepository.findAndCount({ ...pagination, where: { isActive: true } });
 
     return {
-      data,
-      count: data.length,
+      results,
+      count: results.length,
       total
     }
   }
