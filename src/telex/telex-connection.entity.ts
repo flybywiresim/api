@@ -98,7 +98,7 @@ export class TelexConnectionDto extends TelexConnectionUpdateDto {
 
 export class TelexConnectionPaginatedDto {
   @IsNotEmpty()
-  @ApiProperty({ description: 'List of TELEX connections', type: TelexConnection })
+  @ApiProperty({ description: 'List of TELEX connections', type: [TelexConnection] })
   results: TelexConnection[];
 
   @IsNotEmpty()
