@@ -106,3 +106,17 @@ export class TelexConnectionDto extends TelexConnectionUpdateDto {
   @ApiProperty({ description: 'The flight number', example: 'OS 355' })
   flight: string;
 }
+
+export class TelexConnectionPaginatedDto {
+  @IsNotEmpty()
+  @ApiProperty({ description: 'List of TELEX connections', type: [TelexConnection] })
+  results: TelexConnection[];
+
+  @IsNotEmpty()
+  @ApiProperty({ description: 'Amount of connections returned', example: '25' })
+  count: number;
+
+  @IsNotEmpty()
+  @ApiProperty({ description: 'The number of total active connections in database', example: '1237' })
+  total: number;
+}
