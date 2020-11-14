@@ -119,6 +119,20 @@ export class TelexService {
     return conn;
   }
 
+  // TODO: Integrate with ORM to have all properties be searchable
+  async findActiveConnectionByFlight(flight: string): Promise<TelexConnection> {
+    this.logger.log(`Trying to get single active TELEX connection with flight number '${flight}'`);
+
+    const conn = await this.connectionRepository.findOne({flight: flight});
+    if (!conn) {
+      const message = `Active flight with number '${flight}' does not exist`;
+      this.logger.error(message);
+      throw new HttpException(message, 404);
+    }
+
+    return conn;
+  }
+
   async disableConnection(connectionId: string): Promise<void> {
     this.logger.log(`Trying to disable TELEX connection with ID '${connectionId}'`);
 
