@@ -28,6 +28,14 @@ export class TelexConnectionController {
     return await this.telex.getActiveConnections(pagination);
   }
 
+  @Get('_find')
+  @ApiQuery({ name: 'flight', description: 'The flight number', example: 'AAL456' })
+  @ApiOkResponse({ description: 'The connection with the given parameters was found', type: TelexConnection })
+  @ApiNotFoundResponse({ description: 'The connection with the given parameters could not be found' })
+  async findConnection(@Query('flight') flight: string): Promise<TelexConnection> {
+    return await this.telex.findActiveConnectionByFlight(flight);
+  }
+
   @Get(':id')
   @ApiParam({ name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101' })
   @ApiOkResponse({ description: 'The connection with the given ID was found', type: TelexConnection })
