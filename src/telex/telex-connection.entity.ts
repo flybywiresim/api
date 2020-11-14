@@ -63,6 +63,10 @@ export class TelexConnection {
   @ApiProperty({ description: 'Whether the user wants to receive freetext messages', example: true })
   freetextEnabled: boolean;
 
+  @Column()
+  @ApiProperty({ description: 'The aircraft type the connection associated with', example: 'A32NX' })
+  aircraftType?: string;
+
   @Column({ nullable: true })
   @ApiProperty({ description: 'The origin of the flight', example: 'KLAX', required: false })
   origin?: string;
@@ -91,6 +95,10 @@ export class TelexConnectionUpdateDto {
   @IsOptional()
   @ApiProperty({ description: 'Whether the user wants to receive freetext messages', example: true })
   freetextEnabled = true;
+
+  @IsOptional()
+  @ApiProperty({ description: 'The aircraft type the connection associated with', example: 'A32NX' })
+  aircraftType = 'unknown';
 
   @IsOptional()
   @ApiProperty({ description: 'The destination of the flight', example: 'KSFO', required: false })
