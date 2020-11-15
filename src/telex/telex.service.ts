@@ -123,7 +123,7 @@ export class TelexService {
   async findActiveConnectionByFlight(flight: string): Promise<TelexConnection> {
     this.logger.log(`Trying to get single active TELEX connection with flight number '${flight}'`);
 
-    const conn = await this.connectionRepository.findOne({flight: flight});
+    const conn = await this.connectionRepository.findOne({flight: flight, isActive: true});
     if (!conn) {
       const message = `Active flight with number '${flight}' does not exist`;
       this.logger.error(message);
