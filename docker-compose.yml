@@ -3,6 +3,12 @@ services:
   nginx-proxy:
     image: jwilder/nginx-proxy
     container_name: nginx-proxy
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "${LOG_SIZE}"
+        max-file: "${LOG_COUNT}"
     environment:
       - DHPARAM_GENERATION=false
     volumes:
@@ -17,6 +23,12 @@ services:
   nginx-proxy-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     container_name: nginx-proxy-letsencrypt
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "${LOG_SIZE}"
+        max-file: "${LOG_COUNT}"
     environment:
       - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
@@ -29,6 +41,11 @@ services:
     image: nistei/fbw-api:latest
     container_name: fbw_api
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "${LOG_SIZE}"
+        max-file: "${LOG_COUNT}"
     environment:
       - VIRTUAL_HOST=${API_URL}
       - LETSENCRYPT_HOST=${API_URL}
@@ -50,6 +67,11 @@ services:
     image: redis:latest
     container_name: redis
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "${LOG_SIZE}"
+        max-file: "${LOG_COUNT}"
     expose:
       - 6379
 
@@ -73,6 +95,11 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "${LOG_SIZE}"
+        max-file: "${LOG_COUNT}"
     environment:
       - VIRTUAL_HOST=${MAP_URL}
       - LETSENCRYPT_HOST=${MAP_URL}
