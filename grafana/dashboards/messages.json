@@ -221,14 +221,50 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 132
+                "value": 55
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sender"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Recipient"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 104
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Profane"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 48
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 23,
+        "h": 26,
         "w": 12,
         "x": 12,
         "y": 0
@@ -250,7 +286,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  createdAt AS \"Time\",\n  isProfane AS \"Contains profanity\",\n  REPLACE(message, ';', ' ') AS \"Message\"\nFROM telex_message\nWHERE\n  $__timeFilter(createdAt)\nORDER BY createdAt",
+          "rawSql": "SELECT\n  telex_message.createdAt AS \"Time\",\n  c1.flight AS \"Sender\",\n  c2.flight AS \"Recipient\",\n  telex_message.isProfane AS \"Profane\",\n  REPLACE(telex_message.message, ';', ' ') AS \"Message\"\nFROM telex_message\nLEFT OUTER JOIN telex_connection c1 ON telex_message.fromId = c1.id\nLEFT OUTER JOIN telex_connection c2 ON telex_message.toId = c2.id\nWHERE\n  $__timeFilter(createdAt)\nORDER BY createdAt",
           "refId": "A",
           "select": [
             [
@@ -435,5 +471,5 @@
   "timezone": "",
   "title": "Telex Messages",
   "uid": "vEvCNehMz",
-  "version": 2
+  "version": 6
 }

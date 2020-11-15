@@ -19,8 +19,8 @@
   "links": [],
   "panels": [
     {
-      "circleMaxSize": "2",
-      "circleMinSize": 2,
+      "circleMaxSize": "1",
+      "circleMinSize": "1",
       "colors": [
         "#73BF69",
         "#73BF69"
@@ -233,7 +233,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  $__timeGroupAlias(createdAt,$__interval),\r\n  count(*) AS \"Count\"\r\nFROM telex_message\r\nWHERE\r\n  $__timeFilter(createdAt)\r\nGROUP BY 1\r\nORDER BY $__timeGroup(createdAt,$__interval)",
+          "rawSql": "SELECT\r\n  $__timeGroupAlias(firstContact,$__interval),\r\n  count(*) AS \"Count\"\r\nFROM telex_connection\r\nWHERE\r\n  $__timeFilter(firstContact)\r\nGROUP BY 1\r\nORDER BY $__timeGroup(firstContact,$__interval)",
           "refId": "A",
           "select": [
             [
@@ -259,7 +259,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Messages sent in the past week",
+      "title": "Flights last week",
       "type": "stat"
     },
     {
@@ -361,7 +361,7 @@
         "sortBy": [
           {
             "desc": false,
-            "displayName": "Flight"
+            "displayName": "AC Type"
           }
         ]
       },
@@ -372,7 +372,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  ST_Y(location) AS \"Latitude\",\r\n  ST_X(location) AS \"Longitude\",\r\n  DATE_FORMAT(firstContact, \"%H:%iZ\") AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY lastContact",
+          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  freetextEnabled AS \"TELEX enabled\",\r\n  aircraftType AS \"AC Type\",\r\n  DATE_FORMAT(firstContact, \"%H:%iZ\") AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY flight",
           "refId": "A",
           "select": [
             [
@@ -419,5 +419,5 @@
   "timezone": "",
   "title": "FlyByWire Simulations",
   "uid": "U2f2I6hMk",
-  "version": 7
+  "version": 16
 }
