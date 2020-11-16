@@ -111,6 +111,7 @@ services:
       - DATABASE_USER=fbw
     volumes:
       - ./grafana:/etc/grafana
+      - grafana-storage:/var/lib/grafana
     expose:
       - 5000
 
@@ -118,6 +119,7 @@ volumes:
   nginx-certificates:
   nginx-vhosts:
   nginx-html:
+  grafana-storage:
 
 secrets:
   db_password:
