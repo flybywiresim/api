@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Request, UseGuards, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  Param,
+  Post,
+  Put,
+  Query,
+  Request,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
 import { TelexService } from './telex.service';
 import {
@@ -25,7 +38,11 @@ export class TelexConnectionController {
   @ApiQuery({ name: 'take', type: Number, required: false, description: 'The number of connections to take', schema: { maximum: 25, minimum: 0, default: 25 } })
   @ApiQuery({ name: 'skip', type: Number, required: false, description: 'The number of connections to skip', schema: { minimum: 0, default: 0 } })
   async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
-    return await this.telex.getActiveConnections(pagination);
+    // TODO: Investigate the trouble this endpoint causes
+    // It somehow manages to break the whole server when running in PROD
+    throw new HttpException("Endpoint temporarily disabled", 503);
+
+    // return await this.telex.getActiveConnections(pagination);
   }
 
   @Get('_find')
