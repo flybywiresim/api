@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
   Param,
   Post,
   Put,
@@ -38,11 +37,7 @@ export class TelexConnectionController {
   @ApiQuery({ name: 'take', type: Number, required: false, description: 'The number of connections to take', schema: { maximum: 25, minimum: 0, default: 25 } })
   @ApiQuery({ name: 'skip', type: Number, required: false, description: 'The number of connections to skip', schema: { minimum: 0, default: 0 } })
   async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
-    // TODO: Investigate the trouble this endpoint causes
-    // It somehow manages to break the whole server when running in PROD
-    throw new HttpException("Endpoint temporarily disabled", 503);
-
-    // return await this.telex.getActiveConnections(pagination);
+    return await this.telex.getActiveConnections(pagination);
   }
 
   @Get('_find')
