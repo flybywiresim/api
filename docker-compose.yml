@@ -50,13 +50,16 @@ services:
       - VIRTUAL_HOST=${API_URL}
       - LETSENCRYPT_HOST=${API_URL}
       - VIRTUAL_PORT=3000
-      - DATABASE_HOST=mysql
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_DATABASE=${DATABASE_DATABASE}
+      - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASSWORD_FILE=/run/secrets/db_password
       - REDIS_HOST=redis
       - AUTH_SECRET_FILE=/run/secrets/jwt_secret
+      - TELEX_TIMEOUT_MIN=${TELEX_TIMEOUT_MIN}
     depends_on:
       - redis
-      - mysql
     secrets:
       - db_password
       - jwt_secret
@@ -75,22 +78,6 @@ services:
     expose:
       - 6379
 
-  mysql:
-    image: mysql:latest
-    container_name: mysql
-    restart: unless-stopped
-    command: --default-authentication-plugin=mysql_native_password
-    environment:
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
-      - MYSQL_DATABASE=fbw
-      - MYSQL_USER=fbw
-      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-    secrets:
-      - db_root_password
-      - db_password
-    expose:
-      - 3306
-
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -105,10 +92,10 @@ services:
       - LETSENCRYPT_HOST=${MAP_URL}
       - VIRTUAL_PORT=3000
       - GF_INSTALL_PLUGINS=grafana-worldmap-panel
-      - DATABASE_HOST=mysql
-      - DATABASE_PORT=3306
-      - DATABASE_DATABASE=fbw
-      - DATABASE_USER=fbw
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_DATABASE=${DATABASE_DATABASE}
+      - DATABASE_USER=${DATABASE_GRAFANA_USER}
     volumes:
       - ./grafana:/etc/grafana
       - grafana-storage:/var/lib/grafana
@@ -124,7 +111,5 @@ volumes:
 secrets:
   db_password:
     file: secrets/db_password.txt
-  db_root_password:
-    file: secrets/db_root_password.txt
   jwt_secret:
     file: secrets/jwt_secret.txt
