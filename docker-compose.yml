@@ -38,7 +38,7 @@ services:
       - nginx-html:/usr/share/nginx/html
 
   fbw_api:
-    image: nistei/fbw-api:latest
+    image: flybywiresim/api:latest
     container_name: fbw_api
     restart: unless-stopped
     logging:
