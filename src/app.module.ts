@@ -5,7 +5,6 @@ import { MetarController } from './metar/metar.controller';
 import { MetarService } from './metar/metar.service';
 import { AtisController } from './atis/atis.controller';
 import { AtisService } from './atis/atis.service';
-import { TelexConnectionController } from './telex/telex-connection.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelexModule } from './telex/telex.module';
 import { TelexConnection } from './telex/telex-connection.entity';
@@ -75,7 +74,12 @@ import * as winston from 'winston';
     TelexModule,
     HttpModule,
   ],
-  controllers: [AppController, MetarController, AtisController, TelexConnectionController, TafController],
+  controllers: [
+    AppController,
+    MetarController,
+    AtisController,
+    TafController,
+  ],
   providers: [MetarService, AtisService, TafService],
 })
 export class AppModule {
