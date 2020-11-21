@@ -144,7 +144,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "time_series",
@@ -226,7 +226,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "time_series",
@@ -288,7 +288,7 @@
         "content": "<img src=\"https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg\"/>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "time_series",
@@ -365,14 +365,14 @@
           }
         ]
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "table",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  freetextEnabled AS \"TELEX enabled\",\r\n  aircraftType AS \"AC Type\",\r\n  DATE_FORMAT(firstContact, \"%H:%iZ\") AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY flight",
+          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  freetextEnabled AS \"TELEX enabled\",\r\n  aircraftType AS \"AC Type\",\r\n  firstContact AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY flight",
           "refId": "A",
           "select": [
             [
@@ -419,5 +419,5 @@
   "timezone": "",
   "title": "FlyByWire Simulations",
   "uid": "U2f2I6hMk",
-  "version": 16
+  "version": 2
 }

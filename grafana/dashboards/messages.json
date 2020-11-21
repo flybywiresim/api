@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -61,7 +61,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "table",
@@ -140,7 +140,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "table",
@@ -279,7 +279,7 @@
           }
         ]
       },
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
           "format": "table",
@@ -377,7 +377,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.2",
+      "pluginVersion": "7.3.3",
       "pointradius": 1,
       "points": true,
       "renderer": "flot",
@@ -471,5 +471,5 @@
   "timezone": "",
   "title": "Telex Messages",
   "uid": "vEvCNehMz",
-  "version": 6
+  "version": 1
 }
