@@ -1,5 +1,4 @@
-import * as redisStore from 'cache-manager-redis-store';
-import { CacheModule, HttpModule, Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { MetarController } from './metar/metar.controller';
 import { MetarService } from './metar/metar.service';
@@ -16,19 +15,11 @@ import configuration from './config/configuration';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FbwNamingStrategy } from './utilities/db-naming';
 import { WinstonModule } from 'nest-winston';
+import { CacheModule } from './cache/cache.module';
 import * as winston from 'winston';
 
 @Module({
   imports: [
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('redis.host'),
-        port: configService.get<number>('redis.port'),
-      }),
-    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -73,6 +64,7 @@ import * as winston from 'winston';
     }),
     TelexModule,
     HttpModule,
+    CacheModule,
   ],
   controllers: [
     AppController,
