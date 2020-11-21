@@ -1,5 +1,5 @@
 import {
-  Body,
+  Body, CacheInterceptor, CacheTTL,
   Controller,
   Delete,
   Get,
@@ -8,7 +8,7 @@ import {
   Put,
   Query,
   Request,
-  UseGuards,
+  UseGuards, UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
@@ -28,11 +28,13 @@ import { PaginationDto } from 'src/common/Pagination';
 
 @ApiTags('TELEX')
 @Controller('txcxn')
+@UseInterceptors(CacheInterceptor)
 export class TelexConnectionController {
   constructor(private telex: TelexService) {
   }
 
   @Get()
+  @CacheTTL(15)
   @ApiOkResponse({ description: 'The paginated list of connections', type: TelexConnectionPaginatedDto })
   @ApiQuery({ name: 'take', type: Number, required: false, description: 'The number of connections to take', schema: { maximum: 25, minimum: 0, default: 25 } })
   @ApiQuery({ name: 'skip', type: Number, required: false, description: 'The number of connections to skip', schema: { minimum: 0, default: 0 } })
@@ -41,6 +43,7 @@ export class TelexConnectionController {
   }
 
   @Get('_find')
+  @CacheTTL(15)
   @ApiQuery({ name: 'flight', description: 'The flight number', example: 'AAL456' })
   @ApiOkResponse({ description: 'The connection with the given parameters was found', type: TelexConnection })
   @ApiNotFoundResponse({ description: 'The connection with the given parameters could not be found' })
@@ -49,6 +52,7 @@ export class TelexConnectionController {
   }
 
   @Get(':id')
+  @CacheTTL(15)
   @ApiParam({ name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101' })
   @ApiOkResponse({ description: 'The connection with the given ID was found', type: TelexConnection })
   @ApiNotFoundResponse({ description: 'The connection with the given ID could not be found' })
