@@ -372,7 +372,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  freetextEnabled AS \"TELEX enabled\",\r\n  aircraftType AS \"AC Type\",\r\n  firstContact AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY flight",
+          "rawSql": "SELECT\r\n  flight AS \"Flight\",\r\n  trueAltitude AS \"Altitude\",\r\n  heading AS \"Heading\",\r\n  freetextEnabled AS \"TELEX enabled\",\r\n  aircraftType AS \"AC Type\",\r\n  DATE_FORMAT(firstContact, '%H:%iZ') AS \"First Contact\"\r\nFROM telex_connection\r\nWHERE\r\n  isActive = '1'\r\nORDER BY flight",
           "refId": "A",
           "select": [
             [
@@ -419,5 +419,5 @@
   "timezone": "",
   "title": "FlyByWire Simulations",
   "uid": "U2f2I6hMk",
-  "version": 2
+  "version": 4
 }
