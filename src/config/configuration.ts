@@ -13,6 +13,7 @@ export default () => ({
     database: process.env.DATABASE_DATABASE || 'fbw',
     username: process.env.DATABASE_USERNAME || 'fbw',
     password: envOrFile('DATABASE_PASSWORD', './secrets/db_password.txt'),
+    logging: process.env.DATABASE_LOGGING || 'error',
   },
   redis: {
     host: process.env.REDIS_HOST || 'localhost',
