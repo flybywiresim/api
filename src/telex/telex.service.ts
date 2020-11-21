@@ -167,8 +167,8 @@ export class TelexService {
       throw new HttpException(message, 404);
     }
 
-    const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true, freetextEnabled: true });
-    if (!recipient) {
+    const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true });
+    if (!recipient || !recipient.freetextEnabled) {
       const message = `Active flight '${dto.to}' does not exist`;
       this.logger.error(message);
       throw new HttpException(message, 404);

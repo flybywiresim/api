@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
@@ -20,6 +20,7 @@ export class TelexConnection {
   id?: string;
 
   @Column({ default: true })
+  @Index()
   @ApiProperty({ description: 'Whether the connection is an active on or not' })
   isActive?: boolean;
 
@@ -28,10 +29,12 @@ export class TelexConnection {
   firstContact?: Date;
 
   @UpdateDateColumn()
+  @Index()
   @ApiProperty({ description: 'The time of last contact' })
   lastContact?: Date;
 
   @Column({ update: false })
+  @Index()
   @ApiProperty({ description: 'The flight number', example: 'OS 355' })
   flight: string;
 
