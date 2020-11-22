@@ -51,6 +51,13 @@ export class TelexConnectionController {
     return await this.telex.findActiveConnectionByFlight(flight);
   }
 
+  @Get('_count')
+  @CacheTTL(15)
+  @ApiOkResponse({ description: 'The total number of active flights', type: Number })
+  async countConnections(): Promise<number> {
+    return await this.telex.countActiveConnections();
+  }
+
   @Get(':id')
   @CacheTTL(15)
   @ApiParam({ name: 'id', description: 'The connection ID', example: '6571f19e-21f7-4080-b239-c9d649347101' })

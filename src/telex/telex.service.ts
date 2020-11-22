@@ -110,6 +110,12 @@ export class TelexService {
     }
   }
 
+  async countActiveConnections(): Promise<number> {
+    this.logger.debug(`Trying to get total number of active connections`);
+
+    return await this.connectionRepository.count({ isActive: true });
+  }
+
   async getSingleConnection(id: string, active?: boolean): Promise<TelexConnection> {
     this.logger.log(`Trying to get single active TELEX connection with ID '${id}'`);
 
