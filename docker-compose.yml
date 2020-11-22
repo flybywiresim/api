@@ -53,7 +53,7 @@ services:
       - DATABASE_HOST=${DATABASE_HOST}
       - DATABASE_PORT=${DATABASE_PORT}
       - DATABASE_DATABASE=${DATABASE_DATABASE}
-      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
       - DATABASE_PASSWORD_FILE=/run/secrets/db_password
       - REDIS_HOST=redis
       - AUTH_SECRET_FILE=/run/secrets/jwt_secret
