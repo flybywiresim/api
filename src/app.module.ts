@@ -17,6 +17,7 @@ import { FbwNamingStrategy } from './utilities/db-naming';
 import { WinstonModule } from 'nest-winston';
 import { CacheModule } from './cache/cache.module';
 import * as winston from 'winston';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import * as winston from 'winston';
     TelexModule,
     HttpModule,
     CacheModule,
+    HealthModule,
   ],
   controllers: [
     AppController,
