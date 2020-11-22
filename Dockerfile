@@ -25,4 +25,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
+
+HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:3000/health || exit 1
+
 CMD [ "node", "dist/main.js" ]
