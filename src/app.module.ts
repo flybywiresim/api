@@ -18,6 +18,8 @@ import { WinstonModule } from 'nest-winston';
 import { CacheModule } from './cache/cache.module';
 import * as winston from 'winston';
 import { HealthModule } from './health/health.module';
+import { AirportController } from './airport/airport.controller';
+import { AirportService } from './airport/airport.service';
 
 @Module({
   imports: [
@@ -73,8 +75,9 @@ import { HealthModule } from './health/health.module';
     MetarController,
     AtisController,
     TafController,
+    AirportController,
   ],
-  providers: [MetarService, AtisService, TafService],
+  providers: [MetarService, AtisService, TafService, AirportService],
 })
 export class AppModule {
 }
