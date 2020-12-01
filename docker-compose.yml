@@ -40,8 +40,6 @@ services:
   fbw_api:
     image: flybywiresim/api:latest
     restart: unless-stopped
-    deploy:
-      replicas: ${API_REPLICAS}
     logging:
       driver: json-file
       options:

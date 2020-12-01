@@ -42,6 +42,6 @@ jobs:
             cd api
             git fetch --all
             git reset --hard origin/main
-            docker-compose pull
-            docker-compose --env-file ./envs/.env.prod up -d
+            docker-compose --env-file ./envs/.env.prod pull
+            docker-compose --env-file ./envs/.env.prod up -d --scale fbw_api=2
             docker system prune -af
