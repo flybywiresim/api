@@ -41,7 +41,7 @@ jobs:
           script: |
             cd api
             git fetch --all
-            git reset --hard origin/master
+            git reset --hard origin/main
             docker-compose pull
             docker-compose --env-file ./envs/.env.prod up -d
             docker system prune -af
