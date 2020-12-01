@@ -14,6 +14,7 @@ export default () => ({
     username: process.env.DATABASE_USERNAME || 'fbw',
     password: envOrFile('DATABASE_PASSWORD', './secrets/db_password.txt'),
     logging: process.env.DATABASE_LOGGING || 'error',
+    connectionLimit: parseInt(process.env.DATABASE_CONN_LIMIT) || 10,
   },
   redis: {
     host: process.env.REDIS_HOST || 'localhost',

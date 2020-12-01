@@ -38,6 +38,9 @@ import { AirportService } from './airport/airport.service';
         legacySpatialSupport: false,
         namingStrategy: new FbwNamingStrategy(),
         logging: configService.get('database.logging'),
+        extra: {
+          connectionLimit: configService.get<number>('database.connectionLimit'),
+        }
       }),
     }),
     ConfigModule.forRoot({
