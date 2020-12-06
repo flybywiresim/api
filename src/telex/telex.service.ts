@@ -1,5 +1,5 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { Connection, Repository, Transaction, TransactionRepository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelexMessage, TelexMessageDto } from './telex-message.entity';
@@ -35,22 +35,13 @@ export class TelexService {
 
     const connections = await this.connectionRepository
       .createQueryBuilder()
-      .select('*')
+      .update()
+      .set({isActive: false})
       .andWhere(`lastContact < NOW() - INTERVAL ${timeout} MINUTE`)
       .andWhere('isActive = 1')
-      .getRawMany<TelexConnection>();
+      .execute();
 
-    this.logger.verbose(`Found ${connections.length} stale connections`);
-
-    if (connections.length > 0) {
-      await this.connectionRepository.createQueryBuilder('connection')
-        .update()
-        .set({ isActive: false })
-        .where('id IN (:ids)', { ids: connections.map(m => m.id) })
-        .execute();
-    }
-
-    this.logger.debug(`Set ${connections.length} stale connections to inactive`);
+    this.logger.debug(`Set ${connections.affected} stale connections to inactive`);
   }
 
   // ======= Connection Handling ======= //
@@ -83,19 +74,16 @@ export class TelexService {
   async updateConnection(connectionId: string, connection: TelexConnectionUpdateDto): Promise<TelexConnection> {
     this.logger.log(`Trying to update flight with ID '${connectionId}'`);
 
-    const existingFlight = await this.connectionRepository.findOne({ id: connectionId, isActive: true });
+    const change = await this.connectionRepository.update({ id: connectionId, isActive: true }, connection);
 
-    if (!existingFlight) {
+    if (!change.affected) {
       const message = `Active flight with ID '${connectionId}' does not exist`;
       this.logger.error(message);
       throw new HttpException(message, 404);
     }
 
-    this.logger.log(`Updating flight '${existingFlight.flight}'`);
-
-    await this.connectionRepository.update(existingFlight.id, connection);
-
-    return await this.connectionRepository.findOne(existingFlight.id);
+    this.logger.log(`Updated flight with id '${connectionId}'`);
+    return await this.connectionRepository.findOne(connectionId);
   }
 
   async getActiveConnections(pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
@@ -191,15 +179,12 @@ export class TelexService {
     return await this.messageRepository.save(message);
   }
 
-  @Transaction()
   async fetchMyMessages(connectionId: string,
-    acknowledge: boolean,
-    @TransactionRepository(TelexMessage) msgRepo?: Repository<TelexMessage>): Promise<TelexMessage[]> {
+    acknowledge: boolean): Promise<TelexMessage[]> {
     this.logger.log(`Trying to fetch TELEX messages for flight with ID '${connectionId}'`);
 
-    const recipient = await this.getSingleConnection(connectionId, true);
+    const messages = await this.messageRepository.find({to: {id: connectionId}, received: false});
 
-    const messages = await msgRepo.find({ to: recipient, received: false });
     if (!messages || messages.length === 0) {
       const message = `No open TELEX messages found for flight with ID '${connectionId}'`;
       this.logger.log(message);
@@ -209,11 +194,7 @@ export class TelexService {
     if (acknowledge) {
       this.logger.log(`Acknowledging all TELEX messages for flight with ID '${connectionId}'`);
 
-      await msgRepo.createQueryBuilder('message')
-        .update()
-        .set({ received: true })
-        .where('id IN (:ids)', { ids: messages.map(m => m.id) })
-        .execute();
+      await this.messageRepository.update({to: {id: connectionId}, received: false}, {received: true});
     }
 
     messages.forEach(msg => {
