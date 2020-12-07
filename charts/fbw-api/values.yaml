@@ -3,6 +3,8 @@ image:
   tag: latest
   pullPolicy: Always
 
+replicas: 1
+
 service:
   port: 3000
 

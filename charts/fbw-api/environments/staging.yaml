@@ -6,8 +6,10 @@ ingress:
 
 api:
   database:
-    host: mysql-flybywire-api-do-user-8167919-0.b.db.ondigitalocean.com
+    host: private-mysql-flybywiresim-do-user-8167919-0.b.db.ondigitalocean.com
     port: 25060
+    database: fbw_api_staging
+    user: fbw_api_staging
   redis:
     host: redis-staging-master.redis-staging.svc.cluster.local
   telex:
