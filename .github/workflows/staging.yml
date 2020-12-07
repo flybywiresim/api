@@ -46,8 +46,8 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Save DigitalOcean kubeconfig
-        run: doctl kubernetes cluster kubeconfig save ${{ .secrets.DIGITALOCEAN_CLUSTER_ID }}
+        run: doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
       - name: Deploy
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm upgrade --set api.database.password=${{ .secrets.STAGING_DB_PASSWORD }},api.auth.secret=${{ .secrets.STAGING_AUTH_SECRET }},image.tag=$SHA7 -f ./charts/fbw-api/values.yaml -f ./charts/fbw-api/environments/staging.yaml fbw-api-staging ./charts/fbw-api
+          exec: helm upgrade --set api.database.password=${{ secrets.STAGING_DB_PASSWORD }},api.auth.secret=${{ secrets.STAGING_AUTH_SECRET }},image.tag=$SHA7 -f ./charts/fbw-api/values.yaml -f ./charts/fbw-api/environments/staging.yaml fbw-api-staging ./charts/fbw-api
