@@ -2,7 +2,7 @@ ingress:
   fqdn: api.staging.flybywiresim.com
   tls:
     enabled: true
-    issuer: letsencrypt-staging
+    issuer: letsencrypt-prod
 
 api:
   database:
