@@ -1,0 +1,12 @@
+ingress:
+  fqdn: api.staging.flybywiresim.com
+  tls:
+    enabled: true
+    issuer: letsencrypt-staging
+
+api:
+  database:
+    host: mysql-flybywire-api-do-user-8167919-0.b.db.ondigitalocean.com
+    port: 25060
+  telex:
+    timeoutMin: 15

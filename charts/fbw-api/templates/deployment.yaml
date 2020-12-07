@@ -1,0 +1,96 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/name: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ .Chart.Name }}
+    spec:
+      serviceAccountName: {{ .Release.Name }}
+      containers:
+        - name: fbw-api
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            # LOGGER
+            - name: LOGGER_LEVEL
+              value: {{ .Values.api.logger.level }}
+            - name: LOGGER_FORMAT
+              value: {{ .Values.api.logger.format }}
+
+            # DATABASE
+            - name: DATABASE_HOST
+              value: {{ .Values.api.database.host }}
+            - name: DATABASE_PORT
+              value: {{ .Values.api.database.port | quote }}
+            - name: DATABASE_DATABASE
+              value: {{ .Values.api.database.database }}
+            - name: DATABASE_USERNAME
+              value: {{ .Values.api.database.user }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: databasePassword
+            - name: DATABASE_LOGGING
+              value: {{ .Values.api.database.logging }}
+            - name: DATABASE_CONN_LIMIT
+              value: {{ .Values.api.database.connectionLimit | quote }}
+
+            # REDIS
+            - name: REDIS_HOST
+              value: {{ .Values.api.redis.host }}
+            - name: REDIS_PORT
+              value: {{ .Values.api.redis.port |quote }}
+
+            # TELEX
+            - name: TELEX_TIMEOUT_MIN
+              value: {{ .Values.api.telex.timeoutMin | quote }}
+
+            # AUTH
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: authSecret
+            - name: AUTH_EXPIRES
+              value: {{ .Values.api.auth.expires | quote }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 90Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
