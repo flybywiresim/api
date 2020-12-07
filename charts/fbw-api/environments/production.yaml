@@ -1,0 +1,18 @@
+replicas: 4
+
+ingress:
+  fqdn: api.flybywiresim.com
+  tls:
+    enabled: true
+    issuer: letsencrypt-prod
+
+api:
+  database:
+    host: private-mysql-flybywiresim-do-user-8167919-0.b.db.ondigitalocean.com
+    port: 25060
+    database: fbw_api_prod
+    user: fbw_api_prod
+  redis:
+    host: redis-prod-master.redis-prod.svc.cluster.local
+  telex:
+    timeoutMin: 6
