@@ -23,9 +23,9 @@ api:
     user: fbw
     password: somePassword
     logging: error
-    connectionLimit: 8
+    connectionLimit: 5
   redis:
-    host: redis-master.redis.svc.cluster.local
+    host: ~
     port: 6379
   telex:
     timeoutMin: 6
