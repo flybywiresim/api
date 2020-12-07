@@ -32,14 +32,12 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: flybywiresim/api:staging,flybywiresim/api:$SHA7
+          tags: flybywiresim/api:staging,flybywiresim/api:${SHA7}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   depoly_staging:
     runs-on: ubuntu-latest
     needs: [build_and_push, lint_helm]
-    env:
-      SHA7: ${GITHUB_SHA::7}
     steps:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
@@ -50,4 +48,4 @@ jobs:
       - name: Deploy
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm upgrade --set api.database.password=${{ secrets.STAGING_DB_PASSWORD }},api.auth.secret=${{ secrets.STAGING_AUTH_SECRET }},image.tag=$SHA7 -f ./charts/fbw-api/values.yaml -f ./charts/fbw-api/environments/staging.yaml fbw-api-staging ./charts/fbw-api
+          exec: helm upgrade --set api.database.password=${{ secrets.STAGING_DB_PASSWORD }},api.auth.secret=${{ secrets.STAGING_AUTH_SECRET }},image.tag=${SHA7} -f ./charts/fbw-api/values.yaml -f ./charts/fbw-api/environments/staging.yaml fbw-api-staging ./charts/fbw-api
