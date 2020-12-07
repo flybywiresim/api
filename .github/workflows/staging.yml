@@ -42,7 +42,7 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
-  depoly_staging:
+  deploy_staging:
     runs-on: ubuntu-latest
     needs: [build_and_push, lint_helm]
     steps:
@@ -53,6 +53,7 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Save DigitalOcean kubeconfig
         run: doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
+      - run: cp ~/.kube/config ./.kube/
       - name: Deploy
         uses: WyriHaximus/github-action-helm3@v2
         with:
