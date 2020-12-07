@@ -15,5 +15,4 @@ api:
   redis:
     host: redis-prod-master.redis-prod.svc.cluster.local
   telex:
-    # TODO: 30 for transition period. Down to 6 afterwards
-    timeoutMin: 30
+    timeoutMin: 6
