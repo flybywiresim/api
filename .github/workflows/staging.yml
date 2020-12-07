@@ -46,6 +46,10 @@ jobs:
     env:
       SHA7: ${GITHUB_SHA::7}
     steps:
+      - name: Debug
+        run: |
+          ls -la
+          echo ${SHA7}
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
