@@ -10,9 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Lint Helm
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          exec: helm lint ./charts/fbw-api
+        run: helm lint ./charts/fbw-api
   build_and_push:
     runs-on: ubuntu-latest
     steps:
@@ -53,19 +51,8 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - name: Save DigitalOcean kubeconfig
         run: doctl kubernetes cluster kubeconfig save ${{ secrets.DIGITALOCEAN_CLUSTER_ID }}
-      - name: Copy kubectl config to output for helm deploy
-        id: kube
-        run: |
-          CONFIG="$(cat ${HOME}/.kube/config)"
-          CONFIG="${CONFIG//'%'/'%25'}"
-          CONFIG="${CONFIG//$'\n'/'%0A'}"
-          CONFIG="${CONFIG//$'\r'/'%0D'}"
-          echo "::set-output name=config::$CONFIG"
       - name: Deploy
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          kubeconfig: '${{ steps.kube.outputs.config }}'
-          exec: |
-            TAG=$(echo $GITHUB_SHA | head -c7) &&
-            helm upgrade --set api.database.password=${{ secrets.STAGING_DB_PASSWORD }},api.auth.secret=${{ secrets.STAGING_AUTH_SECRET }},image.tag=sha-${TAG} \
-            -f ./charts/fbw-api/values.yaml -f ./charts/fbw-api/environments/staging.yaml fbw-api-staging ./charts/fbw-api
+        run: |
+          TAG=$(echo $GITHUB_SHA | head -c7) &&
+          helm upgrade --set api.database.password=${{ secrets.STAGING_DB_PASSWORD }},api.auth.secret=${{ secrets.STAGING_AUTH_SECRET }},image.tag=sha-${TAG} \
+          -f ./charts/fbw-api/values.yaml -f ./charts/fbw-api/environments/staging.yaml fbw-api-staging ./charts/fbw-api
