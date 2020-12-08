@@ -14,3 +14,4 @@ api:
     host: redis-staging-master.redis-staging.svc.cluster.local
   telex:
     timeoutMin: 15
+    disableCleanup: true

@@ -7,9 +7,12 @@ import * as rateLimit from 'express-rate-limit';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { start as startApm } from 'elastic-apm-node';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger: false });
+  startApm();
+
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   // correct source IP

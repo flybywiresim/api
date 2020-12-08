@@ -1,8 +1,7 @@
-## FBW API
+![FlyByWireLogo](https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg)
+## FlyByWire Simulations API
 
-## Running the API
-
-### Locally
+### Developing
 
 Run the `setup.sh` script to create the required secrets for the service to connect to a database.
 After that services can be started using `docker-compose -f docker-compose.dev.yml up -d` commands.
@@ -11,19 +10,6 @@ After that services can be started using `docker-compose -f docker-compose.dev.y
 # install all dependencies
 $ npm install
 
-# development
-$ npm run start
-
 # watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
-
-### Specific environment
-
-Run the command `setup.sh` to set up the secrets.
-Adapt the secrets with your passwords.
-Create a .env-file in the `envs` directory containing the configuration.
-After that services can be started using `docker-compose --env-file ./envs/<<your-config>> up -d` commands.
