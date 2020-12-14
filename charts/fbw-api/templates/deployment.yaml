@@ -27,6 +27,15 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
+            - value: NODE_ENV
+              name: production
+
+            # APM
+            - name: ELASTIC_APM_ACTIVE
+              value: {{ .Values.apm.active | quote }}
+            - name: ELASTIC_APM_SERVER_URL
+              value: {{ .Values.apm.serverUrl }}
+
             # LOGGER
             - name: LOGGER_LEVEL
               value: {{ .Values.api.logger.level }}
@@ -61,6 +70,8 @@ spec:
             # TELEX
             - name: TELEX_TIMEOUT_MIN
               value: {{ .Values.api.telex.timeoutMin | quote }}
+            - name: TELEX_DISABLE_CLEANUP
+              value: {{ .Values.api.telex.disableCleanup | quote }}
 
             # AUTH
             - name: AUTH_SECRET

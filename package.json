@@ -6,6 +6,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "compose": "docker-compose up -d",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -36,6 +37,7 @@
     "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
+    "elastic-apm-node": "^3.9.0",
     "express-rate-limit": "^5.1.3",
     "fast-xml-parser": "^3.17.4",
     "helmet": "^4.1.1",

@@ -21,6 +21,7 @@ export default () => ({
     port: parseInt(process.env.REDIS_PORT) || 6379,
   },
   telex: {
+    disableCleanup: envBool('TELEX_DISABLE_CLEANUP', true),
     timeoutMin: parseInt(process.env.TELEX_TIMEOUT_MIN) || 6,
   },
   auth: {
@@ -43,6 +44,14 @@ function envOrFile(envName: string, defaultPath?: string): string {
   }
 
   return "";
+}
+
+function envBool(envName: string, defaultValue: boolean): boolean {
+  if (process.env[envName]) {
+    return process.env[envName].toLowerCase() === 'true';
+  }
+
+  return defaultValue;
 }
 
 function getLoggingFormat(env: string) {

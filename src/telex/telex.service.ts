@@ -30,6 +30,10 @@ export class TelexService {
 
   @Cron('*/5 * * * * *')
   private async checkForStaleConnections() {
+    if (this.configService.get<boolean>('telex.disableCleanup')) {
+      return;
+    }
+
     const timeout = this.configService.get<number>('telex.timeoutMin');
     this.logger.verbose(`Trying to cleanup stale TELEX connections older than ${timeout} minutes`);
 
