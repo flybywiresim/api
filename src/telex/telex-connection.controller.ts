@@ -25,6 +25,7 @@ import {
 import { Token } from '../auth/token.class';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PaginationDto } from 'src/common/Pagination';
+import { BoundsDto } from '../common/Bounds';
 
 @ApiTags('TELEX')
 @Controller('txcxn')
@@ -38,8 +39,13 @@ export class TelexConnectionController {
   @ApiOkResponse({ description: 'The paginated list of connections', type: TelexConnectionPaginatedDto })
   @ApiQuery({ name: 'take', type: Number, required: false, description: 'The number of connections to take', schema: { maximum: 25, minimum: 0, default: 25 } })
   @ApiQuery({ name: 'skip', type: Number, required: false, description: 'The number of connections to skip', schema: { minimum: 0, default: 0 } })
-  async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
-    return await this.telex.getActiveConnections(pagination);
+  @ApiQuery({ name: 'north', type: Number, required: false, description: 'Latitude for the north edge of the bounding box', schema: { minimum: -90, maximum: 90, default: 90 } })
+  @ApiQuery({ name: 'east', type: Number, required: false, description: 'Longitude for the east edge of the bounding box', schema: { minimum: -180, maximum: 180, default: 180 } })
+  @ApiQuery({ name: 'south', type: Number, required: false, description: 'Latitude for the south edge of the bounding box', schema: { minimum: -90, maximum: 90, default: -90 } })
+  @ApiQuery({ name: 'west', type: Number, required: false, description: 'Longitude for the west edge of the bounding box', schema: { minimum: -180, maximum: 180, default: -180 } })
+  async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto,
+                                @Query(new ValidationPipe({ transform: true })) bounds: BoundsDto): Promise<TelexConnectionPaginatedDto> {
+    return await this.telex.getActiveConnections(pagination, bounds);
   }
 
   @Get('_find')
