@@ -40,7 +40,7 @@ export class TelexConnection {
 
   @Column({
     type: 'point',
-    nullable: true,
+    nullable: false,
     transformer: {
       from: v => {
         return {
@@ -51,6 +51,7 @@ export class TelexConnection {
       to: v => `POINT(${v.x} ${v.y})`,
     },
   })
+  @Index({ spatial: true })
   @ApiProperty({ description: 'The current location of the aircraft' })
   location: Point;
 
