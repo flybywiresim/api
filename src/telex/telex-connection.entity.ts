@@ -129,6 +129,6 @@ export class TelexConnectionPaginatedDto {
   count: number;
 
   @IsNotEmpty()
-  @ApiProperty({ description: 'The number of total active connections in database', example: '1237' })
+  @ApiProperty({ description: 'The number of total active connections in the boundary', example: '1237' })
   total: number;
 }
