@@ -10,6 +10,7 @@ import { AuthService } from '../auth/auth.service';
 import { Token } from '../auth/token.class';
 import { BannedFlightNumbers, MessageFilters } from './filters';
 import { PaginationDto } from 'src/common/Pagination';
+import { BoundsDto } from '../common/Bounds';
 
 @Injectable()
 export class TelexService {
@@ -90,10 +91,19 @@ export class TelexService {
     return await this.connectionRepository.findOne(connectionId);
   }
 
-  async getActiveConnections(pagination: PaginationDto): Promise<TelexConnectionPaginatedDto> {
+  async getActiveConnections(pagination: PaginationDto, bounds: BoundsDto): Promise<TelexConnectionPaginatedDto> {
     this.logger.log(`Trying to get ${pagination.take} TELEX connections, skipped ${pagination.skip}`);
 
-    const [results, total] = await this.connectionRepository.findAndCount({ ...pagination, where: { isActive: true } });
+    const [results, total] = await this.connectionRepository
+      .createQueryBuilder()
+      .select()
+      .skip(pagination.skip)
+      .take(pagination.take)
+      .where({ isActive: true })
+      .andWhere(
+        `ST_Contains(ST_MakeEnvelope(ST_GeomFromText('POINT(${bounds.west} ${bounds.north})'), ST_GeomFromText('POINT(${bounds.east} ${bounds.south})')), location)`
+      )
+      .getManyAndCount();
 
     return {
       results,
