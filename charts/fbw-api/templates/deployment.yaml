@@ -27,8 +27,8 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
-            - value: NODE_ENV
-              name: production
+            - name: NODE_ENV
+              value: production
 
             # APM
             - name: ELASTIC_APM_ACTIVE
