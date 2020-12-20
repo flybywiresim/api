@@ -200,14 +200,14 @@ export class TelexService {
 
     const messages = await this.messageRepository.find({to: {id: connectionId}, received: false});
 
-    if (!messages || messages.length === 0) {
-      const message = `No open TELEX messages found for flight with ID '${connectionId}'`;
+    if (!messages) {
+      const message = `Error while fetching TELEX messages for flight with ID '${connectionId}'`;
       this.logger.log(message);
-      throw new HttpException(message, 404);
+      throw new HttpException(message, 500);
     }
 
-    if (acknowledge) {
-      this.logger.log(`Acknowledging all TELEX messages for flight with ID '${connectionId}'`);
+    if (acknowledge && messages.length > 0) {
+      this.logger.log(`Acknowledging ${messages.length} TELEX messages for flight with ID '${connectionId}'`);
 
       await this.messageRepository.update({to: {id: connectionId}, received: false}, {received: true});
     }
