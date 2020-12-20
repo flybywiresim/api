@@ -1,4 +1,4 @@
-replicas: 4
+replicas: 3
 
 ingress:
   fqdn: api.flybywiresim.com
