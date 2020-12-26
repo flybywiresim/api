@@ -11,7 +11,12 @@ import {
   UseGuards, UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
+import {
+  TelexConnection,
+  TelexConnectionDto,
+  TelexConnectionUpdateDto,
+  TelexConnectionPaginatedDto,
+} from './telex-connection.entity';
 import { TelexService } from './telex.service';
 import {
   ApiBadRequestResponse,
