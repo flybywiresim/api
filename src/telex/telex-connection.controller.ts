@@ -9,13 +9,13 @@ import {
   Query,
   Request,
   UseGuards, UseInterceptors,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import {
   TelexConnection,
   TelexConnectionDto,
   TelexConnectionUpdateDto,
-  TelexConnectionPaginatedDto,
+  TelexConnectionPaginatedDto
 } from './telex-connection.entity';
 import { TelexService } from './telex.service';
 import {
@@ -25,7 +25,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam, ApiQuery, ApiSecurity,
-  ApiTags,
+  ApiTags
 } from '@nestjs/swagger';
 import { Token } from '../auth/token.class';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -42,12 +42,48 @@ export class TelexConnectionController {
   @Get()
   @CacheTTL(15)
   @ApiOkResponse({ description: 'The paginated list of connections', type: TelexConnectionPaginatedDto })
-  @ApiQuery({ name: 'take', type: Number, required: false, description: 'The number of connections to take', schema: { maximum: 25, minimum: 0, default: 25 } })
-  @ApiQuery({ name: 'skip', type: Number, required: false, description: 'The number of connections to skip', schema: { minimum: 0, default: 0 } })
-  @ApiQuery({ name: 'north', type: Number, required: false, description: 'Latitude for the north edge of the bounding box', schema: { minimum: -90, maximum: 90, default: 90 } })
-  @ApiQuery({ name: 'east', type: Number, required: false, description: 'Longitude for the east edge of the bounding box', schema: { minimum: -180, maximum: 180, default: 180 } })
-  @ApiQuery({ name: 'south', type: Number, required: false, description: 'Latitude for the south edge of the bounding box', schema: { minimum: -90, maximum: 90, default: -90 } })
-  @ApiQuery({ name: 'west', type: Number, required: false, description: 'Longitude for the west edge of the bounding box', schema: { minimum: -180, maximum: 180, default: -180 } })
+  @ApiQuery({
+    name: 'take',
+    type: Number,
+    required: false,
+    description: 'The number of connections to take',
+    schema: { maximum: 25, minimum: 0, default: 25 }
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: Number,
+    required: false,
+    description: 'The number of connections to skip',
+    schema: { minimum: 0, default: 0 }
+  })
+  @ApiQuery({
+    name: 'north',
+    type: Number,
+    required: false,
+    description: 'Latitude for the north edge of the bounding box',
+    schema: { minimum: -90, maximum: 90, default: 90 }
+  })
+  @ApiQuery({
+    name: 'east',
+    type: Number,
+    required: false,
+    description: 'Longitude for the east edge of the bounding box',
+    schema: { minimum: -180, maximum: 180, default: 180 }
+  })
+  @ApiQuery({
+    name: 'south',
+    type: Number,
+    required: false,
+    description: 'Latitude for the south edge of the bounding box',
+    schema: { minimum: -90, maximum: 90, default: -90 }
+  })
+  @ApiQuery({
+    name: 'west',
+    type: Number,
+    required: false,
+    description: 'Longitude for the west edge of the bounding box',
+    schema: { minimum: -180, maximum: 180, default: -180 }
+  })
   async getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto,
                                 @Query(new ValidationPipe({ transform: true })) bounds: BoundsDto): Promise<TelexConnectionPaginatedDto> {
     return await this.telex.getActiveConnections(pagination, bounds);
@@ -81,7 +117,7 @@ export class TelexConnectionController {
   @Post()
   @ApiBody({
     description: 'The new connection containing the flight number and current location',
-    type: TelexConnectionDto,
+    type: TelexConnectionDto
   })
   @ApiCreatedResponse({ description: 'A flight got created', type: Token })
   @ApiBadRequestResponse({ description: 'An active flight with the given flight number is already in use' })

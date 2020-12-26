@@ -31,7 +31,9 @@ export class TafService {
 
   // AviationWeather
   private handleAviationWeather(icao: string): Observable<Taf> {
-    return this.http.get<any>(`https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=xml&stationString=${icao}&hoursBeforeNow=0`)
+    return this.http.get<any>(
+      'https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs' +
+      `&requestType=retrieve&format=xml&stationString=${icao}&hoursBeforeNow=0`)
       .pipe(
         tap(response => this.logger.debug(`Response status ${response.status} for AviationWeather TAF request`)),
         map(response => {

@@ -101,7 +101,8 @@ export class TelexService {
       .take(pagination.take)
       .where({ isActive: true })
       .andWhere(
-        `ST_Contains(ST_MakeEnvelope(ST_GeomFromText('POINT(${bounds.west} ${bounds.north})'), ST_GeomFromText('POINT(${bounds.east} ${bounds.south})')), location)`
+        `ST_Contains(ST_MakeEnvelope(ST_GeomFromText('POINT(${bounds.west} ${bounds.north})'),` +
+        ` ST_GeomFromText('POINT(${bounds.east} ${bounds.south})')), location)`
       )
       .orderBy('firstContact', 'ASC')
       .getManyAndCount();
