@@ -41,7 +41,7 @@ export class TelexService {
     const connections = await this.connectionRepository
       .createQueryBuilder()
       .update()
-      .set({isActive: false})
+      .set({ isActive: false })
       .andWhere(`lastContact < NOW() - INTERVAL ${timeout} MINUTE`)
       .andWhere('isActive = 1')
       .execute();
@@ -68,7 +68,7 @@ export class TelexService {
       throw new HttpException(message, 409);
     }
 
-    const newFlight: TelexConnection = {...connection};
+    const newFlight: TelexConnection = { ...connection };
 
     this.logger.log(`Registering new flight '${connection.flight}'`);
     await this.connectionRepository.save(newFlight);
@@ -137,7 +137,7 @@ export class TelexService {
   async findActiveConnectionByFlight(flight: string): Promise<TelexConnection> {
     this.logger.log(`Trying to get single active TELEX connection with flight number '${flight}'`);
 
-    const conn = await this.connectionRepository.findOne({flight: flight, isActive: true});
+    const conn = await this.connectionRepository.findOne({ flight: flight, isActive: true });
     if (!conn) {
       const message = `Active flight with number '${flight}' does not exist`;
       this.logger.error(message);
@@ -199,7 +199,7 @@ export class TelexService {
     acknowledge: boolean): Promise<TelexMessage[]> {
     this.logger.log(`Trying to fetch TELEX messages for flight with ID '${connectionId}'`);
 
-    const messages = await this.messageRepository.find({to: {id: connectionId}, received: false});
+    const messages = await this.messageRepository.find({ to: { id: connectionId }, received: false });
 
     if (!messages) {
       const message = `Error while fetching TELEX messages for flight with ID '${connectionId}'`;
@@ -210,7 +210,7 @@ export class TelexService {
     if (acknowledge && messages.length > 0) {
       this.logger.log(`Acknowledging ${messages.length} TELEX messages for flight with ID '${connectionId}'`);
 
-      await this.messageRepository.update({to: {id: connectionId}, received: false}, {received: true});
+      await this.messageRepository.update({ to: { id: connectionId }, received: false }, { received: true });
     }
 
     messages.forEach(msg => {

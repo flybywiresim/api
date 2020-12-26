@@ -23,5 +23,10 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'quotes': ['error', 'single'],
     'max-len': ['error', { code: 144, tabWidth: 2 }],
+    'object-curly-spacing': [
+        'error',
+        'always',
+        { 'arraysInObjects': false, 'objectsInObjects': false }
+      ],
   },
 };

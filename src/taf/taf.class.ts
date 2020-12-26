@@ -11,6 +11,6 @@ export class Taf {
   })
   taf: string;
 
-  @ApiProperty({description: 'The source of the TAF notice', enum: ['aviationweather', 'faa'] })
+  @ApiProperty({ description: 'The source of the TAF notice', enum: ['aviationweather', 'faa']})
   source: string;
 }

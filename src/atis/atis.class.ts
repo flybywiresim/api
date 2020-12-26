@@ -4,7 +4,7 @@ export class Atis {
   @ApiProperty({ description: 'The airport ICAO', example: 'KLAX' })
   icao: string;
 
-  @ApiProperty({description: 'The source of the ATIS notice', enum: ['faa', 'vatsim', 'ivao', 'pilotedge'] })
+  @ApiProperty({ description: 'The source of the ATIS notice', enum: ['faa', 'vatsim', 'ivao', 'pilotedge']})
   source: string;
 
   @ApiProperty({
@@ -17,9 +17,9 @@ export class Atis {
   })
   combined?: string;
 
-  @ApiProperty({description: 'The arrival ATIS notice' })
+  @ApiProperty({ description: 'The arrival ATIS notice' })
   arr?: string;
 
-  @ApiProperty({description: 'The departure ATIS notice' })
+  @ApiProperty({ description: 'The departure ATIS notice' })
   dep?: string;
 }

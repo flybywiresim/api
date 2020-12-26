@@ -13,9 +13,9 @@ export class AirportController {
 
   @Get(':icao')
   @CacheTTL(86400)
-  @ApiParam({name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX'})
-  @ApiOkResponse({description: 'Airport was found', type: Airport})
-  @ApiNotFoundResponse( {description: 'Airport was not found'})
+  @ApiParam({ name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX' })
+  @ApiOkResponse({ description: 'Airport was found', type: Airport })
+  @ApiNotFoundResponse( { description: 'Airport was not found' })
   getForICAO(@Param('icao') icao: string): Observable<Airport> {
     return this.airport.getForICAO(icao);
   }

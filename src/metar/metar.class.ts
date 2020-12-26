@@ -10,6 +10,6 @@ export class Metar {
   })
   metar: string;
 
-  @ApiProperty({description: 'The source of the METAR notice', enum: ['vatsim', 'ms', 'ivao', 'pilotedge'] })
+  @ApiProperty({ description: 'The source of the METAR notice', enum: ['vatsim', 'ms', 'ivao', 'pilotedge']})
   source: string;
 }
