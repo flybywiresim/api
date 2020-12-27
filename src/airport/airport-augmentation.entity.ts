@@ -11,7 +11,7 @@ export class AirportAugmentation {
   id?: string;
 
   @Column({ default: '' })
-  @Index()
+  @Index({ unique: true })
   @ApiProperty({ description: 'The icao of the airport' })
   icao: string;
 
