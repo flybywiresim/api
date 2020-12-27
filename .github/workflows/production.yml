@@ -2,7 +2,8 @@ name: Production CI
 
 on:
   push:
-    branches: main
+    branches:
+      - main
 
 jobs:
   lint_helm:

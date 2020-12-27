@@ -43,7 +43,7 @@ function envOrFile(envName: string, defaultPath?: string): string {
     return fs.readFileSync(defaultPath).toString();
   }
 
-  return "";
+  return '';
 }
 
 function envBool(envName: string, defaultValue: boolean): boolean {

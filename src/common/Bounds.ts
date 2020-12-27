@@ -1,5 +1,5 @@
-import { Type } from "class-transformer";
-import { Max, Min } from "class-validator";
+import { Type } from 'class-transformer';
+import { Max, Min } from 'class-validator';
 
 export class BoundsDto {
   @Type(() => Number)
