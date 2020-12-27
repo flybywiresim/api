@@ -24,4 +24,7 @@ export class Airport {
 
   @ApiProperty({ description: 'The country the airport is in', example: 'US' })
   country: string;
+
+  @ApiProperty({ description: 'The transition altitude of the airport', example: 18000 })
+  transAlt: number;
 }
