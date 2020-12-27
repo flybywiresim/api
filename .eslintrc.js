@@ -21,5 +21,12 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'quotes': ['error', 'single'],
+    'max-len': ['error', { code: 144, tabWidth: 2 }],
+    'object-curly-spacing': [
+        'error',
+        'always',
+        { 'arraysInObjects': false, 'objectsInObjects': false }
+      ],
   },
 };

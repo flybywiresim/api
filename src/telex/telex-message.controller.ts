@@ -29,7 +29,7 @@ export class TelexMessageController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiSecurity('jwt')
-  @ApiOkResponse({ description: 'Open messages for the recipient. Will get automatically acknowledged', type: [TelexMessage] })
+  @ApiOkResponse({ description: 'Open messages for the recipient. Will get automatically acknowledged', type: [TelexMessage]})
   async getMessagesForConnection(@Request() req): Promise<TelexMessage[]> {
     return await this.telex.fetchMyMessages(req.user.connectionId, true);
   }
