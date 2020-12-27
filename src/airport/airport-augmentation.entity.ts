@@ -3,12 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class AirportAugmentation {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   @ApiProperty({
     description: 'The unique identifier of the airport',
-    example: '6571f19e-21f7-4080-b239-c9d649347101',
+    example: '1234',
   })
-  id?: string;
+  id?: number;
 
   @Column({ default: '' })
   @Index({ unique: true })
