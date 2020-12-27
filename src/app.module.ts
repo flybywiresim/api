@@ -6,8 +6,6 @@ import { AtisController } from './atis/atis.controller';
 import { AtisService } from './atis/atis.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TelexModule } from './telex/telex.module';
-import { TelexConnection } from './telex/telex-connection.entity';
-import { TelexMessage } from './telex/telex-message.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TafController } from './taf/taf.controller';
 import { TafService } from './taf/taf.service';
@@ -18,8 +16,7 @@ import { WinstonModule } from 'nest-winston';
 import { CacheModule } from './cache/cache.module';
 import * as winston from 'winston';
 import { HealthModule } from './health/health.module';
-import { AirportController } from './airport/airport.controller';
-import { AirportService } from './airport/airport.service';
+import { AirportModule } from './airport/airport.module';
 
 @Module({
   imports: [
@@ -33,7 +30,7 @@ import { AirportService } from './airport/airport.service';
         username: configService.get('database.username'),
         password: configService.get('database.password'),
         database: configService.get('database.database'),
-        entities: [TelexConnection, TelexMessage],
+        autoLoadEntities: true,
         synchronize: true,
         legacySpatialSupport: false,
         namingStrategy: new FbwNamingStrategy(),
@@ -72,15 +69,15 @@ import { AirportService } from './airport/airport.service';
     HttpModule,
     CacheModule,
     HealthModule,
+    AirportModule,
   ],
   controllers: [
     AppController,
     MetarController,
     AtisController,
     TafController,
-    AirportController,
   ],
-  providers: [MetarService, AtisService, TafService, AirportService],
+  providers: [MetarService, AtisService, TafService],
 })
 export class AppModule {
 }

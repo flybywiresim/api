@@ -7,11 +7,11 @@ import * as rateLimit from 'express-rate-limit';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { start as startApm } from 'elastic-apm-node';
+import { start } from 'elastic-apm-node';
+start();
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger: false });
-  startApm();
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger: true });
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
