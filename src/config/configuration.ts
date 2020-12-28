@@ -28,6 +28,9 @@ export default () => ({
     secret: envOrFile('AUTH_SECRET', './secrets/jwt_secret.txt') || 'FlyByWire',
     expires: process.env.AUTH_EXPIRES || '12h',
   },
+  github: {
+    token: envOrFile('GITHUB_TOKEN', './secrets/github_token.txt') || '',
+  }
 });
 
 function envOrFile(envName: string, defaultPath?: string): string {
@@ -36,11 +39,11 @@ function envOrFile(envName: string, defaultPath?: string): string {
   }
 
   if (process.env[envName + '_FILE']) {
-    return fs.readFileSync(process.env[envName + '_FILE']).toString();
+    return fs.readFileSync(process.env[envName + '_FILE']).toString().trim();
   }
 
   if (defaultPath && fs.existsSync(defaultPath)) {
-    return fs.readFileSync(defaultPath).toString();
+    return fs.readFileSync(defaultPath).toString().trim();
   }
 
   return '';

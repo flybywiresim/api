@@ -81,6 +81,13 @@ spec:
                   key: authSecret
             - name: AUTH_EXPIRES
               value: {{ .Values.api.auth.expires | quote }}
+
+            # GITHUB
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: githubToken
           resources:
             requests:
               cpu: 100m
