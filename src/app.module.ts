@@ -17,6 +17,7 @@ import { CacheModule } from './cache/cache.module';
 import * as winston from 'winston';
 import { HealthModule } from './health/health.module';
 import { AirportModule } from './airport/airport.module';
+import { GitVersionsModule } from './git-versions/git-versions.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { AirportModule } from './airport/airport.module';
     CacheModule,
     HealthModule,
     AirportModule,
+    GitVersionsModule,
   ],
   controllers: [
     AppController,
