@@ -50,6 +50,7 @@ jobs:
       VALUES_FILE: ./charts/fbw-api/environments/staging.yaml
       DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
       AUTH_SECRET: ${{ secrets.STAGING_AUTH_SECRET }}
+      GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
     steps:
       - uses: actions/checkout@v1
       - name: Install doctl
@@ -62,4 +63,5 @@ jobs:
         run: |
           TAG=$(echo $GITHUB_SHA | head -c7) &&
           helm upgrade --namespace ${NAMESPACE} --set api.database.password=${DB_PASSWORD},api.auth.secret=${AUTH_SECRET},image.tag=sha-${TAG} \
+          --set api.github.token=${GITHUB_TOKEN} \
           -f ./charts/fbw-api/values.yaml -f ${VALUES_FILE} ${RELEASE_NAME} ./charts/fbw-api

@@ -39,3 +39,5 @@ api:
   auth:
     secret: someSecret
     expires: 12h
+  github:
+    token: someToken
