@@ -134,17 +134,16 @@ export class TelexService {
   }
 
   // TODO: Integrate with ORM to have all properties be searchable
-  async findActiveConnectionByFlight(flight: string): Promise<TelexConnection> {
-    this.logger.log(`Trying to get single active TELEX connection with flight number '${flight}'`);
+  async findActiveConnectionByFlight(query: string): Promise<TelexConnection[]> {
+    this.logger.log(`Trying to get single active TELEX connection with flight number '${query}'`);
 
-    const conn = await this.connectionRepository.findOne({ flight: flight, isActive: true });
-    if (!conn) {
-      const message = `Active flight with number '${flight}' does not exist`;
-      this.logger.error(message);
-      throw new HttpException(message, 404);
-    }
-
-    return conn;
+    return await this.connectionRepository
+      .createQueryBuilder()
+      .select()
+      .andWhere(`flight LIKE '${query}%'`)
+      .andWhere('isActive = 1')
+      .orderBy('flight', 'ASC')
+      .getMany();
   }
 
   async disableConnection(connectionId: string): Promise<void> {
