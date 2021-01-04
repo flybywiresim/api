@@ -1,13 +1,23 @@
-import { CacheInterceptor, CacheTTL, Controller, Get, Param, UseInterceptors } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, CacheInterceptor, CacheTTL, Controller, Get, Param, Post, UseInterceptors } from '@nestjs/common';
+import { ApiBody, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AirportService } from './airport.service';
-import { Airport } from './airport.class';
+import { Airport, AirportBatchDto } from './airport.class';
 
 @ApiTags('Airport')
 @Controller('api/v1/airport')
 @UseInterceptors(CacheInterceptor)
 export class AirportController {
   constructor(private airport: AirportService) {
+  }
+
+  @Post('_batch')
+  @ApiBody({
+    description: 'List of all ICAOs to fetch',
+    type: AirportBatchDto
+  })
+  @ApiOkResponse({ description: 'List of found airports', type: [Airport]})
+  getBatch(@Body() body: AirportBatchDto): Promise<Airport[]> {
+    return this.airport.getBatch(body);
   }
 
   @Get(':icao')
