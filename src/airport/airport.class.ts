@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 export class Airport {
   @ApiProperty({ description: 'The airport ICAO', example: 'KLAX' })
@@ -27,4 +28,10 @@ export class Airport {
 
   @ApiProperty({ description: 'The transition altitude of the airport', example: 18000 })
   transAlt: number;
+}
+
+export class AirportBatchDto {
+  @IsNotEmpty()
+  @ApiProperty({ description: 'The ICAOs to fetch', example: ['KLAX', 'KSFO']})
+  icaos: string[];
 }

@@ -1,6 +1,7 @@
 import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule as NestCache, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheService } from './cache.service';
 
 @Global()
 @Module({
@@ -15,8 +16,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
   ],
+  providers: [
+    CacheService,
+  ],
   exports: [
-    NestCache
+    NestCache,
+    CacheService,
   ],
 })
 export class CacheModule {}
