@@ -21,7 +21,7 @@ export class AirportController {
   }
 
   @Get(':icao')
-  @CacheTTL(86400)
+  @CacheTTL(345600)
   @ApiParam({ name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX' })
   @ApiOkResponse({ description: 'Airport was found', type: Airport })
   @ApiNotFoundResponse( { description: 'Airport was not found' })
