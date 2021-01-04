@@ -34,37 +34,41 @@ export class AirportService {
       }
 
       if (response.data.errorMessage || response.data.count > 1) {
+        // Cache upstream 404s for 1 day
+        this.cache.set(`/api/v1/airport/${icao}`, { icao }, 86400); // 1 days
         throw new HttpException(`Airport with ICAO '${icaoCode}' not found`, 404);
       }
 
       foundAirport = response.data.results[0];
+
+      let augResult: AirportAugmentation | undefined;
+      try {
+        augResult = await this.augmentation.findOne({ icao: icao });
+      } catch (_) {}
+
+      const augmentedAirport = {
+        icao: foundAirport.icao,
+        type: foundAirport.type,
+        name: foundAirport.name,
+        lat: foundAirport.lat,
+        lon: foundAirport.lon,
+        elevation: foundAirport.elev || foundAirport.elevation,
+        continent: foundAirport.continent,
+        country: foundAirport.country,
+        transAlt: augResult?.transAlt || NaN,
+      };
+      this.cache.set(`/api/v1/airport/${icao}`, augmentedAirport, 345600); // 4 days
+
+      return augmentedAirport;
     } else {
-      foundAirport = cacheHit;
+      return cacheHit;
     }
-
-    let augResult: AirportAugmentation | undefined;
-    try {
-      augResult = await this.augmentation.findOne({ icao: icao });
-    } catch (_) {}
-
-    const augmentedAirport = {
-      icao: foundAirport.icao,
-      type: foundAirport.type,
-      name: foundAirport.name,
-      lat: foundAirport.lat,
-      lon: foundAirport.lon,
-      elevation: foundAirport.elev || foundAirport.elevation,
-      continent: foundAirport.continent,
-      country: foundAirport.country,
-      transAlt: augResult?.transAlt || NaN,
-    };
-    this.cache.set(`/api/v1/airport/${icao}`, augmentedAirport, 86400);
-
-    return augmentedAirport;
   }
 
   async getBatch(icaos: AirportBatchDto): Promise<Airport[]> {
-    const res = await Promise.all(icaos.icaos.map(async icao => {
+    const uniqueIcaos = [...new Set(icaos.icaos)];
+
+    const res = await Promise.all(uniqueIcaos.map(async icao => {
       try {
         return await this.getForICAO(icao);
       } catch (_) {}
