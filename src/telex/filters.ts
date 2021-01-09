@@ -3,7 +3,7 @@ export const BannedFlightNumbers = [
   'DISPATCHER',
   'FBW',
   'FBWTEAM',
-  
+
   'AAL11',
   'AAL77',
   'MH17',
@@ -13,6 +13,8 @@ export const BannedFlightNumbers = [
   'AF447',
   'MSR990',
   'MSR804',
+  'SJ182',
+  'SJY182',
 ];
 
 export const MessageFilters = [
