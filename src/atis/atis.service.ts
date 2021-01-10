@@ -2,6 +2,7 @@ import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Atis } from './atis.class';
+import { CacheService } from '../cache/cache.service';
 
 // TODO: investigate
 // For some reason iconv is not working with import
@@ -12,23 +13,24 @@ const iconv = require('iconv-lite');
 export class AtisService {
   private readonly logger = new Logger(AtisService.name);
 
-  constructor(private http: HttpService) {
+  constructor(private http: HttpService,
+              private readonly cache: CacheService) {
   }
 
-  getForICAO(icao: string, source?: string): Observable<Atis> {
+  getForICAO(icao: string, source?: string): Promise<Atis> {
     const icaoCode = icao.toUpperCase();
     this.logger.debug(`Searching for ICAO ${icaoCode} from source ${source}`);
 
     switch (source?.toLowerCase()) {
       case 'faa':
       default:
-        return this.handleFaa(icaoCode);
+        return this.handleFaa(icaoCode).toPromise();
       case 'vatsim':
         return this.handleVatsim(icaoCode);
       case 'ivao':
-        return this.handleIvao(icaoCode);
+        return this.handleIvao(icaoCode).toPromise();
       case 'pilotedge':
-        return this.handlePilotEdge(icaoCode);
+        return this.handlePilotEdge(icaoCode).toPromise();
     }
   }
 
@@ -66,37 +68,42 @@ export class AtisService {
   }
 
   // Vatsim
-  // TODO: Cache
-  private fetchVatsimBlob(): Observable<any> {
-    return this.http.get<any>('http://cluster.data.vatsim.net/vatsim-data.json')
-      .pipe(
-        tap(response => this.logger.debug(`Response status ${response.status} for VATSIM ATIS request`)),
-        map(response => {
-          return response.data;
-        }),
-      );
+  private async fetchVatsimBlob(): Promise<any> {
+    const cacheHit = await this.cache.get('/atis/blob/vatsim');
+
+    if (cacheHit) {
+      this.logger.debug('Returning from cache');
+      return cacheHit;
+    } else {
+      const data = await this.http.get<any>('http://cluster.data.vatsim.net/vatsim-data.json')
+        .pipe(
+          tap(response => this.logger.debug(`Response status ${response.status} for VATSIM ATIS request`)),
+          tap(response => this.logger.debug(`Response contains ${response.data.clients.length} entries`)),
+          map(response => {
+            return response.data;
+          }),
+        ).toPromise();
+
+      this.cache.set('/atis/blob/vatsim', data, 120);
+      return data;
+    }
   }
 
-  private handleVatsim(icao: string): Observable<Atis> {
+  private handleVatsim(icao: string): Promise<Atis> {
     return this.fetchVatsimBlob()
-      .pipe(
-        tap(response => this.logger.debug(`Response contains ${response.clients.length} entries`)),
-        map(response => {
-          return {
-            icao,
-            source: 'Vatsim',
-            combined: response.clients
-              .find(x => x.callsign === icao + '_ATIS').atis_message
-              .replace(/\^§/g, ' ')
-              .toUpperCase(),
-          };
-        }),
-        catchError(
-          err => {
-            throw this.generateNotAvailableException(err, icao);
-          },
-        ),
-      );
+      .then(response => {
+        return {
+          icao,
+          source: 'Vatsim',
+          combined: response.clients
+            .find(x => x.callsign === icao + '_ATIS').atis_message
+            .replace(/\^§/g, ' ')
+            .toUpperCase(),
+        };
+      })
+      .catch(e => {
+        throw this.generateNotAvailableException(e, icao);
+      });
   }
 
   // IVAO
@@ -158,8 +165,10 @@ export class AtisService {
       );
   }
 
-  private generateNotAvailableException(err: any, icao: string): HttpException {
-    this.logger.error(err.message || JSON.stringify(err));
-    throw new HttpException('ATIS not available for ICAO: ' + icao, 404);
+  private generateNotAvailableException(err: any, icao: string) {
+    const exception = new HttpException('ATIS not available for ICAO: ' + icao, 404);
+    this.logger.error(err);
+    this.logger.error(exception);
+    return exception;
   }
 }
