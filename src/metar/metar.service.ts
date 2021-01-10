@@ -6,28 +6,30 @@ import {
 import { Observable } from 'rxjs';
 import { Metar } from './metar.class';
 import { catchError, map, tap } from 'rxjs/operators';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class MetarService {
   private readonly logger = new Logger(MetarService.name);
 
-  constructor(private http: HttpService) {
+  constructor(private http: HttpService,
+              private readonly cache: CacheService) {
   }
 
-  getForICAO(icao: string, source?: string): Observable<Metar> {
+  getForICAO(icao: string, source?: string): Promise<Metar> {
     const icaoCode = icao.toUpperCase();
     this.logger.debug(`Searching for ICAO ${icaoCode} from source ${source}`);
 
     switch (source?.toLowerCase()) {
       case 'vatsim':
       default:
-        return this.handleVatsim(icaoCode);
+        return this.handleVatsim(icaoCode).toPromise();
       case 'ms':
         return this.handleMs(icaoCode);
       case 'ivao':
         return this.handleIvao(icaoCode);
       case 'pilotedge':
-        return this.handlePilotEdge(icaoCode);
+        return this.handlePilotEdge(icaoCode).toPromise();
     }
   }
 
@@ -52,57 +54,65 @@ export class MetarService {
   }
 
   // MS
-  // TODO: Cache
-  fetchMsBlob(): Observable<string[]> {
-    return this.http.get<string>('https://fsxweatherstorage.blob.core.windows.net/fsxweather/metars.bin')
-      .pipe(
-        tap(response => this.logger.debug(`Response status ${response.status} for MS METAR request`)),
-        map(response => {
-          return response.data.split(/\r?\n/);
-        }),
-      );
+  async fetchMsBlob(): Promise<string[]> {
+    const cacheHit = await this.cache.get<string[]>('/metar/blob/ms');
+
+    if (cacheHit) {
+      this.logger.debug('Returning from cache');
+      return cacheHit;
+    } else {
+      const data = await this.http.get<string>('https://fsxweatherstorage.blob.core.windows.net/fsxweather/metars.bin')
+        .pipe(
+          tap(response => this.logger.debug(`Response status ${response.status} for MS METAR request`)),
+          map(response => {
+            return response.data.split(/\r?\n/);
+          }),
+        ).toPromise();
+
+      this.cache.set('/metar/blob/ms', data, 240);
+      return data;
+    }
   }
 
-  private handleMs(icao: string): Observable<Metar> {
+  private handleMs(icao: string): Promise<Metar> {
     return this.fetchMsBlob()
-      .pipe(
-        tap(response => this.logger.debug(`Response contains ${response.length} entries`)),
-        map(response => {
-          return { icao: icao, metar: response.find(x => x.startsWith(icao)), source: 'MS' };
-        }),
-        catchError(
-          err => {
-            throw this.generateNotAvailableException(err, icao);
-          },
-        ),
-      );
+      .then(response => {
+        return { icao: icao, metar: response.find(x => x.startsWith(icao)), source: 'MS' };
+      })
+      .catch(e => {
+        throw this.generateNotAvailableException(e, icao);
+      });
   }
 
   // IVAO
-  // TODO: Cache
-  private fetchIvaoBlob(): Observable<string[]> {
-    return this.http.get<string>('http://wx.ivao.aero/metar.php')
-      .pipe(
-        tap(response => this.logger.debug(`Response status ${response.status} for IVAO METAR request`)),
-        map(response => {
-          return response.data.split(/\r?\n/);
-        }),
-      );
+  private async fetchIvaoBlob(): Promise<string[]> {
+    const cacheHit = await this.cache.get<string[]>('/metar/blob/ivao');
+
+    if (cacheHit) {
+      this.logger.debug('Returning from cache');
+      return cacheHit;
+    } else {
+      const data = await this.http.get<string>('http://wx.ivao.aero/metar.php')
+        .pipe(
+          tap(response => this.logger.debug(`Response status ${response.status} for IVAO METAR request`)),
+          map(response => {
+            return response.data.split(/\r?\n/);
+          }),
+        ).toPromise();
+
+      this.cache.set('/metar/blob/ivao', data, 240);
+      return data;
+    }
   }
 
-  private handleIvao(icao: string): Observable<Metar> {
+  private handleIvao(icao: string): Promise<Metar> {
     return this.fetchIvaoBlob()
-      .pipe(
-        tap(response => this.logger.debug(`Response contains ${response.length} entries`)),
-        map(response => {
-          return { icao: icao, metar: response.find(x => x.startsWith(icao)), source: 'IVAO' };
-        }),
-        catchError(
-          err => {
-            throw this.generateNotAvailableException(err, icao);
-          },
-        ),
-      );
+      .then(response => {
+        return { icao: icao, metar: response.find(x => x.startsWith(icao)), source: 'IVAO' };
+      })
+      .catch(e => {
+        throw this.generateNotAvailableException(e, icao);
+      });
   }
 
   // PilotEdge
@@ -122,7 +132,9 @@ export class MetarService {
   }
 
   private generateNotAvailableException(err: any, icao: string): HttpException {
-    this.logger.error(err.message || JSON.stringify(err));
-    throw new HttpException('METAR not available for ICAO: ' + icao, 404);
+    const exception = new HttpException('METAR not available for ICAO: ' + icao, 404);
+    this.logger.error(err);
+    this.logger.error(exception);
+    return exception;
   }
 }
