@@ -1,7 +1,6 @@
 import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { TafService } from './taf.service';
 import { Taf } from './taf.class';
-import { Observable } from 'rxjs';
 import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('TAF')
@@ -17,7 +16,7 @@ export class TafController {
   @ApiQuery({ name: 'source', description: 'The source for the TAF', example: 'faa', required: false, enum: ['aviationweather', 'faa']})
   @ApiOkResponse({ description: 'TAF notice was found', type: Taf })
   @ApiNotFoundResponse( { description: 'TAF not available for ICAO' })
-  getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Observable<Taf> {
+  getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Promise<Taf> {
     return this.taf.getForICAO(icao, source);
   }
 }

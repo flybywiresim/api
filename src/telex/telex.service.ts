@@ -143,6 +143,7 @@ export class TelexService {
       .andWhere(`flight LIKE '${query}%'`)
       .andWhere('isActive = 1')
       .orderBy('flight', 'ASC')
+      .limit(50)
       .getMany();
   }
 
