@@ -93,12 +93,9 @@ export class TelexConnectionUpdateDto {
   @ApiProperty({ description: 'The heading the aircraft in degrees', example: 250.46, minimum: 0, maximum: 360 })
   heading: number;
 
-  // Set it to true to support the old MCDU implementation (0.4.1)
-  // 0.4.1 does this check in the frontend
-  // TODO: Remove the default value after 0.5.0 release
   @IsOptional()
   @ApiProperty({ description: 'Whether the user wants to receive freetext messages', example: true })
-  freetextEnabled = true;
+  freetextEnabled: boolean;
 
   @IsOptional()
   @ApiProperty({ description: 'The aircraft type the connection associated with', example: 'A32NX' })
