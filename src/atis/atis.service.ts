@@ -28,7 +28,7 @@ export class AtisService {
       case 'vatsim':
         return this.handleVatsim(icaoCode);
       case 'ivao':
-        return this.handleIvao(icaoCode).toPromise();
+        return this.handleIvao(icaoCode);
       case 'pilotedge':
         return this.handlePilotEdge(icaoCode).toPromise();
     }
@@ -107,42 +107,47 @@ export class AtisService {
   }
 
   // IVAO
-  // TODO: Cache
-  private fetchIvaoBlob(): Observable<string[]> {
-    return this.http.get<Buffer>('https://api.ivao.aero/getdata/whazzup/whazzup.txt', { responseType: 'arraybuffer' })
-      .pipe(
-        tap(response => this.logger.debug(`Response status ${response.status} for IVAO ATIS request`)),
-        map(response => {
-          return iconv
-            .decode(response.data, 'ISO-8859-1')
-            .split(/\r?\n/);
-        }),
-      );
+  private async fetchIvaoBlob(): Promise<string[]> {
+    const cacheHit = await this.cache.get<string[]>('/atis/blob/ivao');
+
+    if (cacheHit) {
+      this.logger.debug('Returning from cache');
+      return cacheHit;
+    } else {
+      const data = await this.http.get<Buffer>('https://api.ivao.aero/getdata/whazzup/whazzup.txt', { responseType: 'arraybuffer' })
+        .pipe(
+          tap(response => this.logger.debug(`Response status ${response.status} for IVAO ATIS request`)),
+          tap(response => this.logger.debug(`Response contains ${response.data.length} entries`)),
+          map(response => {
+            return iconv
+              .decode(response.data, 'ISO-8859-1')
+              .split(/\r?\n/);
+          }),
+        ).toPromise();
+
+      this.cache.set('/atis/blob/ivao', data, 120);
+      return data;
+    }
   }
 
-  private handleIvao(icao: string): Observable<Atis> {
+  private handleIvao(icao: string): Promise<Atis> {
     return this.fetchIvaoBlob()
-      .pipe(
-        tap(response => this.logger.debug(`Response contains ${response.length} entries`)),
-        map(response => {
-          return {
-            icao,
-            source: 'IVAO',
-            combined: response
-              .find(x => x.startsWith(icao + '_TWR'))
-              .split(':')[35]
-              .split('^§')
-              .slice(1)
-              .join(' ')
-              .toUpperCase(),
-          };
-        }),
-        catchError(
-          err => {
-            throw this.generateNotAvailableException(err, icao);
-          },
-        ),
-      );
+      .then(response => {
+        return {
+          icao,
+          source: 'IVAO',
+          combined: response
+            .find(x => x.startsWith(icao + '_TWR'))
+            .split(':')[35]
+            .split('^§')
+            .slice(1)
+            .join(' ')
+            .toUpperCase(),
+        };
+      })
+      .catch(e => {
+        throw this.generateNotAvailableException(e, icao);
+      });
   }
 
   // PilotEdge
