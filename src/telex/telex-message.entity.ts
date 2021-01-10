@@ -31,7 +31,7 @@ export class TelexMessage {
   from: TelexConnection;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne(type => TelexConnection, x => x.id)
+  @ManyToOne(type => TelexConnection, x => x.id, { eager: true })
   @ApiProperty({ description: 'The recipient connection' })
   to: TelexConnection;
 }
