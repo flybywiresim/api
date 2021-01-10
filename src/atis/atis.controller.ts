@@ -1,6 +1,5 @@
 import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { AtisService } from './atis.service';
-import { Observable } from 'rxjs';
 import { Atis } from './atis.class';
 import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
@@ -23,7 +22,7 @@ export class AtisController {
   })
   @ApiOkResponse({ description: 'ATIS notice was found', type: Atis })
   @ApiNotFoundResponse({ description: 'ATIS not available for ICAO' })
-  getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Observable<Atis> {
+  getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Promise<Atis> {
     return this.atis.getForICAO(icao, source);
   }
 }
