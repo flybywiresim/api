@@ -69,7 +69,7 @@ export class MetarService {
           }),
         ).toPromise();
 
-      this.cache.set('/metar/blob/ms', data, 240);
+      this.cache.set('/metar/blob/ms', data, 240).then();
       return data;
     }
   }
@@ -100,7 +100,7 @@ export class MetarService {
           }),
         ).toPromise();
 
-      this.cache.set('/metar/blob/ivao', data, 240);
+      this.cache.set('/metar/blob/ivao', data, 240).then();
       return data;
     }
   }

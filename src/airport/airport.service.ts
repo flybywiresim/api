@@ -35,7 +35,7 @@ export class AirportService {
 
       if (response.data.errorMessage || response.data.count > 1) {
         // Cache upstream 404s for 1 day
-        this.cache.set(`/api/v1/airport/${icao}`, { icao }, 86400); // 1 days
+        this.cache.set(`/api/v1/airport/${icao}`, { icao }, 86400).then(); // 1 days
         throw new HttpException(`Airport with ICAO '${icaoCode}' not found`, 404);
       }
 
@@ -57,7 +57,7 @@ export class AirportService {
         country: foundAirport.country,
         transAlt: augResult?.transAlt || NaN,
       };
-      this.cache.set(`/api/v1/airport/${icao}`, augmentedAirport, 345600); // 4 days
+      this.cache.set(`/api/v1/airport/${icao}`, augmentedAirport, 345600).then(); // 4 days
 
       return augmentedAirport;
     } else {

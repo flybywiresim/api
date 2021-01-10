@@ -84,7 +84,7 @@ export class AtisService {
           }),
         ).toPromise();
 
-      this.cache.set('/atis/blob/vatsim', data, 120);
+      this.cache.set('/atis/blob/vatsim', data, 120).then();
       return data;
     }
   }
@@ -125,7 +125,7 @@ export class AtisService {
           }),
         ).toPromise();
 
-      this.cache.set('/atis/blob/ivao', data, 120);
+      this.cache.set('/atis/blob/ivao', data, 120).then();
       return data;
     }
   }
