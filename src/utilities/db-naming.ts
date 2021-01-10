@@ -11,8 +11,6 @@ export class FbwNamingStrategy extends DefaultNamingStrategy implements NamingSt
       `${tableOrName}_${referencedTablePath}`,
     );
 
-    return`fk_${name}`
-    // TODO: Hash it? Long names can cause issues
-    // return`fk_${crypto.createHash('md5').update(name).digest("hex")}`
+    return`fk_${name}`;
   }
 }
