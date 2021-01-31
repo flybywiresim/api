@@ -1,6 +1,6 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { CommitInfo, ReleaseInfo } from './git-versions.class';
+import { CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
 import { catchError, map, tap } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
 
@@ -69,6 +69,41 @@ export class GitVersionsService {
           err => {
             this.logger.error(err);
             throw new HttpException('Could not fetch GitHub releases', err.response.status || 500);
+          },
+        ),
+      );
+  }
+
+  getPulls(user: string, repo: string): Observable<PullInfo[]> {
+    this.logger.debug(`Trying to fetch pulls for ${user}/${repo}`);
+
+    return this.http.post<any>('https://api.github.com/graphql', {
+      query: `{repository(owner:"${user}",name:"${repo}"){pullRequests(first:100,states:OPEN)
+      {nodes{number title state isDraft author{login}labels(first:10){nodes{name}}}}}}`
+    }, {
+      headers: this.headers
+    })
+      .pipe(
+        tap(response => this.logger.debug(`Response status ${response.status} for GitHub pull request`)),
+        map(response => {
+          const pulls: PullInfo[] = [];
+
+          response.data.data.repository.pullRequests.nodes.forEach(pull => {
+            pulls.push({
+              number: pull.number,
+              title: pull.title,
+              author: pull.author.login,
+              labels: pull.labels.nodes.map(label => label.name),
+              isDraft: pull.isDraft
+            })
+          })
+
+          return pulls;
+        }),
+        catchError(
+          err => {
+            this.logger.error(err);
+            throw new HttpException('Could not fetch GitHub releases', err.response?.status || 500);
           },
         ),
       );

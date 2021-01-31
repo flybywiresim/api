@@ -1,15 +1,17 @@
 # <img src="https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg" placeholder="FlyByWire" width="400"/>
 ## FlyByWire Simulations API
 
-### Developing
+## Developing
 
-Run the `setup.sh` script to create the required secrets for the service to connect to a database.
+Please make sure you have:
+
+NodeJS 14 - [Homepage](https://nodejs.org/en/)
 
 ```bash
 # install all dependencies
 $ npm install
 
-# start mysql using compose
+# start MySQL and Redis using docker-compose
 $ npm run compose
 
 # watch mode
