@@ -129,3 +129,11 @@ export class TelexConnectionPaginatedDto {
   @ApiProperty({ description: 'The number of total active connections in the boundary', example: '1237' })
   total: number;
 }
+
+export class TelexSearchResult {
+  @ApiProperty({ description: 'A possible full text match' })
+  fullMatch?: TelexConnection;
+
+  @ApiProperty({ description: 'All possible matches', type: [TelexConnection]})
+  matches: TelexConnection[];
+}
