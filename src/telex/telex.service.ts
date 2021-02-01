@@ -1,6 +1,12 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { Connection, Repository } from 'typeorm';
-import { TelexConnection, TelexConnectionDto, TelexConnectionUpdateDto, TelexConnectionPaginatedDto } from './telex-connection.entity';
+import {
+  TelexConnection,
+  TelexConnectionDto,
+  TelexConnectionUpdateDto,
+  TelexConnectionPaginatedDto,
+  TelexSearchResult,
+} from './telex-connection.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TelexMessage, TelexMessageDto } from './telex-message.entity';
 import * as Filter from 'bad-words';
@@ -134,10 +140,10 @@ export class TelexService {
   }
 
   // TODO: Integrate with ORM to have all properties be searchable
-  async findActiveConnectionByFlight(query: string): Promise<TelexConnection[]> {
-    this.logger.log(`Trying to get single active TELEX connection with flight number '${query}'`);
+  async findActiveConnectionByFlight(query: string): Promise<TelexSearchResult> {
+    this.logger.log(`Trying to search for active TELEX connections with flight number '${query}'`);
 
-    return await this.connectionRepository
+    const matches = await this.connectionRepository
       .createQueryBuilder()
       .select()
       .andWhere(`flight LIKE '${query}%'`)
@@ -145,6 +151,11 @@ export class TelexService {
       .orderBy('flight', 'ASC')
       .limit(50)
       .getMany();
+
+    return {
+      matches,
+      fullMatch: matches.find(x => x.flight === query) ?? null,
+    }
   }
 
   async disableConnection(connectionId: string): Promise<void> {

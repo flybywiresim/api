@@ -15,7 +15,8 @@ import {
   TelexConnection,
   TelexConnectionDto,
   TelexConnectionUpdateDto,
-  TelexConnectionPaginatedDto
+  TelexConnectionPaginatedDto,
+  TelexSearchResult,
 } from './telex-connection.entity';
 import { TelexService } from './telex.service';
 import {
@@ -92,8 +93,8 @@ export class TelexConnectionController {
   @Get('_find')
   @CacheTTL(15)
   @ApiQuery({ name: 'flight', description: 'The flight number', example: 'AAL456' })
-  @ApiOkResponse({ description: 'All connections matching the query', type: [TelexConnection]})
-  async findConnection(@Query('flight') flight: string): Promise<TelexConnection[]> {
+  @ApiOkResponse({ description: 'All connections matching the query', type: TelexSearchResult})
+  async findConnection(@Query('flight') flight: string): Promise<TelexSearchResult> {
     return await this.telex.findActiveConnectionByFlight(flight);
   }
 
