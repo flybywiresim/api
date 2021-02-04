@@ -117,11 +117,11 @@ export class GitVersionsService {
       .pipe(
         tap(response => this.logger.debug(`Response status ${response.status} for GitHub pull request checks`)),
         map(response => {
-          const matches = response.data.matchAll(new RegExp(`<a href="\/${user}\/${repo}\/actions\/runs\/(\\d+)"`, 'g'));
+          const matches = response.data.match(new RegExp(`<a href="\/${user}\/${repo}\/actions\/runs\/(\\d+)"`, 'g'));
           const ids = [];
 
           for (const match of matches) {
-            ids.push(match[1]);
+            ids.push(/runs\/(\d+)/g.exec(match)[1]);
           }
 
           return ids;
