@@ -2,7 +2,7 @@ import { CacheInterceptor, CacheTTL, Controller, Get, Param, UseInterceptors } f
 import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GitVersionsService } from './git-versions.service';
 import { Observable } from 'rxjs';
-import { CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
+import { ArtifactInfo, CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
 
 @ApiTags('Git Versions')
 @Controller('api/v1/git-versions')
@@ -37,6 +37,16 @@ export class GitVersionsController {
   @ApiOkResponse({ description: 'The newest commit on the branch', type: [PullInfo]})
   getPulls(@Param('user') user: string, @Param('repo') repo: string): Observable<PullInfo[]> {
     return this.service.getPulls(user, repo);
+  }
+
+  @Get(':user/:repo/pulls/:pull/artifact')
+  @CacheTTL(60)
+  @ApiParam({ name: 'user', description: 'The owner of the repository', example: 'flybywiresim' })
+  @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
+  @ApiParam({ name: 'pull', description: 'The number of the PR', example: '3295' })
+  @ApiOkResponse({ description: 'The artifact URL for this PR', type: ArtifactInfo })
+  getArtifact(@Param('user') user: string, @Param('repo') repo: string, @Param('pull') pull: string): Promise<ArtifactInfo> {
+    return this.service.getArtifactForPull(user, repo, pull);
   }
 
 }

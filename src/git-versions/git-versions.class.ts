@@ -35,3 +35,8 @@ export class PullInfo {
   @ApiProperty({ description: 'Whether the PR is still a draft' })
   isDraft: boolean;
 }
+
+export class ArtifactInfo {
+  @ApiProperty({ description: 'URL of the artifact', example: 'https://.../zip' })
+  artifactUrl: string;
+}

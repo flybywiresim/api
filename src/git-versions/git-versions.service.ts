@@ -1,6 +1,6 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
+import { ArtifactInfo, CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
 import { catchError, map, tap } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
 
@@ -38,7 +38,7 @@ export class GitVersionsService {
         catchError(
           err => {
             this.logger.error(err);
-            throw new HttpException('Could not fetch GitHub commit', err.response.status || 500);
+            throw new HttpException('Could not fetch GitHub commit', err.response.status || err.status || 500);
           },
         ),
       );
@@ -68,7 +68,7 @@ export class GitVersionsService {
         catchError(
           err => {
             this.logger.error(err);
-            throw new HttpException('Could not fetch GitHub releases', err.response.status || 500);
+            throw new HttpException('Could not fetch GitHub releases', err.response.status || err.status || 500);
           },
         ),
       );
@@ -84,7 +84,7 @@ export class GitVersionsService {
       headers: this.headers
     })
       .pipe(
-        tap(response => this.logger.debug(`Response status ${response.status} for GitHub pull request`)),
+        tap(response => this.logger.debug(`Response status ${response.status} for GitHub pull requests`)),
         map(response => {
           const pulls: PullInfo[] = [];
 
@@ -103,9 +103,63 @@ export class GitVersionsService {
         catchError(
           err => {
             this.logger.error(err);
-            throw new HttpException('Could not fetch GitHub releases', err.response?.status || 500);
+            throw new HttpException('Could not fetch GitHub pull requests', err.response?.status || err.status || 500);
           },
         ),
       );
+  }
+
+  async getArtifactForPull(user: string, repo: string, pull: string): Promise<ArtifactInfo> {
+    // Fuck you GH API for making me do this
+    const checkIds = await this.http.get<string>(`https://github.com/${user}/${repo}/pull/${pull}/checks`, {
+      headers: this.headers
+    })
+      .pipe(
+        tap(response => this.logger.debug(`Response status ${response.status} for GitHub pull request checks`)),
+        map(response => {
+          const matches = response.data.match(new RegExp(`<a href="\/${user}\/${repo}\/actions\/runs\/(\\d+)"`, 'g'));
+          const ids = [];
+
+          for (const match of matches) {
+            ids.push(/runs\/(\d+)/g.exec(match)[1]);
+          }
+
+          return ids;
+        }),
+        catchError(
+          err => {
+            this.logger.error(err);
+            throw new HttpException('Could not fetch GitHub checks for PR', err.response?.status || err.status || 500);
+          },
+        ),
+      ).toPromise();
+
+    const artifacts = await Promise.all(checkIds.map(async checkId => {
+      return await this.http.get<any>(`https://api.github.com/repos/${user}/${repo}/actions/runs/${checkId}/artifacts`, {
+        headers: this.headers
+      })
+        .pipe(
+          tap(response => this.logger.debug(`Response status ${response.status} for GitHub artifact request`)),
+          map(response => {
+            if (response.data.total_count !== 1) {
+              return undefined;
+            }
+
+            return response.data.artifacts[0].archive_download_url;
+          }),
+          catchError(
+            err => {
+              this.logger.error(err);
+              throw new HttpException('Could not fetch GitHub artifact for check', err.response?.status || err.status || 500);
+            },
+          ),
+        ).toPromise();
+    }));
+
+    if (!artifacts.some(x => x !== undefined)) {
+      throw new HttpException('Could not find artifact for PR', 404);
+    }
+
+    return { artifactUrl: artifacts.find(x => x !== undefined) };
   }
 }
