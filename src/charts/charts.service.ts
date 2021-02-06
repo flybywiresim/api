@@ -46,7 +46,7 @@ export class ChartsService {
             urls.push(match[1]);
           }
 
-          charts["charts"] = urls 
+          charts.charts = urls 
 
           return charts;
         }),
