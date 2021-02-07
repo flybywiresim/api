@@ -18,11 +18,11 @@ export class ChartsService {
               private readonly cache: CacheService) {
   }
 
-  getForICAO(icao: string): Promise<Charts> {
+  getForICAO(icao: string): Observable<Charts> {
     const icaoCode = icao.toUpperCase();
     this.logger.debug(`Searching for ICAO ${icaoCode}`);
 
-    return this.handleFaa(icaoCode).toPromise();
+    return this.handleFaa(icaoCode);
   }
 
   // FAA

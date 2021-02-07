@@ -2,6 +2,7 @@ import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseIntercept
 import { ChartsService } from './charts.service';
 import { Charts } from './charts.class';
 import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 
 @ApiTags('Charts')
 @Controller('charts')
@@ -15,7 +16,7 @@ export class ChartsController {
   @ApiParam({ name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX' })
   @ApiOkResponse({ description: 'Charts were found', type: Charts })
   @ApiNotFoundResponse({ description: 'Charts not available for ICAO' })
-  getForICAO(@Param('icao') icao: string): Promise<Charts> {
+  getForICAO(@Param('icao') icao: string): Observable<Charts> {
     return this.charts.getForICAO(icao);
   }
 }
