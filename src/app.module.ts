@@ -9,6 +9,8 @@ import { TelexModule } from './telex/telex.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TafController } from './taf/taf.controller';
 import { TafService } from './taf/taf.service';
+import { ChartsController } from './charts/charts.controller';
+import { ChartsService } from './charts/charts.service';
 import configuration from './config/configuration';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FbwNamingStrategy } from './utilities/db-naming';
@@ -78,8 +80,9 @@ import { GitVersionsModule } from './git-versions/git-versions.module';
     MetarController,
     AtisController,
     TafController,
+    ChartsController
   ],
-  providers: [MetarService, AtisService, TafService],
+  providers: [MetarService, AtisService, TafService, ChartsService],
 })
 export class AppModule {
 }
