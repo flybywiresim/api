@@ -27,12 +27,14 @@ export class ChartsService {
             throw this.generateNotAvailableException(response.data, icao);
           }
 
-          const regexp = /<span class="chartLink"><i class="icon-cog"><[\/]i> <a href="(.*)" /g;
+          const regexp = /<span class="chartLink"><i class="icon-cog"><\/i> <a href="(.+)">(.+)<\/a><\/span>/g;
           const matches = [...response.data.matchAll(regexp)];
 
           return {
             icao,
-            charts: matches.map(x => x[1])
+            charts: matches.map(x => {
+              return { url: x[1], name: x[2] };
+            })
           };
         }),
         catchError(
