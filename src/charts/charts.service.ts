@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Charts } from './charts.class';
 import { CacheService } from '../cache/cache.service';
+import { lambda } from 'elastic-apm-node';
 
 // TODO: investigate
 // For some reason iconv is not working with import
@@ -37,18 +38,10 @@ export class ChartsService {
           const regexp = /<span class="chartLink"><i class="icon-cog"><[\/]i> <a href="(.*)" /g;
           const matches = [...response.data.matchAll(regexp)];
 
-          const charts: Charts = {
-            icao
+          return {
+            icao,
+            charts: matches.map(x => x[1])
           };
-          let urls = [];
-
-          for (const match of matches) {
-            urls.push(match[1]);
-          }
-
-          charts.charts = urls 
-
-          return charts;
         }),
         catchError(
           err => {
