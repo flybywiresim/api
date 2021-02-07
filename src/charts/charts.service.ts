@@ -2,20 +2,12 @@ import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Charts } from './charts.class';
-import { CacheService } from '../cache/cache.service';
-import { lambda } from 'elastic-apm-node';
-
-// TODO: investigate
-// For some reason iconv is not working with import
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const iconv = require('iconv-lite');
 
 @Injectable()
 export class ChartsService {
   private readonly logger = new Logger(ChartsService.name);
 
-  constructor(private http: HttpService,
-              private readonly cache: CacheService) {
+  constructor(private http: HttpService) {
   }
 
   getForICAO(icao: string): Observable<Charts> {
