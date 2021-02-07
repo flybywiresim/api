@@ -27,7 +27,7 @@ export class ChartsService {
             throw this.generateNotAvailableException(response.data, icao);
           }
 
-          const regexp = /<span class="chartLink"><i class="icon-cog"><\/i> <a href="(.+)">(.+)<\/a><\/span>/g;
+          const regexp = /<span class="chartLink"><i class="icon-cog"><\/i> <a href="(.+)" target="_blank">(.+)<\/a><\/span>/g;
           const matches = [...response.data.matchAll(regexp)];
 
           return {
