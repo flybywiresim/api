@@ -30,6 +30,7 @@ api:
     password: somePassword
     logging: error
     connectionLimit: 5
+    replicas: []
   redis:
     host: ~
     port: 6379

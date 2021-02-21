@@ -26,22 +26,62 @@ import { GitVersionsModule } from './git-versions/git-versions.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('database.host'),
-        port: configService.get<number>('database.port'),
-        username: configService.get('database.username'),
-        password: configService.get('database.password'),
-        database: configService.get('database.database'),
-        autoLoadEntities: true,
-        synchronize: true,
-        legacySpatialSupport: false,
-        namingStrategy: new FbwNamingStrategy(),
-        logging: configService.get('database.logging'),
-        extra: {
-          connectionLimit: configService.get<number>('database.connectionLimit'),
+      useFactory: (configService: ConfigService) => {
+        const masterHost = configService.get('database.host');
+        const username = configService.get('database.username');
+        const password = configService.get('database.password');
+        const database = configService.get('database.database');
+        const port = configService.get<number>('database.port');
+        const replicas = configService.get<string>('database.replicas').split(';').filter(x => x !== '');
+
+        if (replicas.length > 0) {
+          console.log('Using replicas', replicas);
+          return {
+            type: 'mysql',
+            replication: {
+              master: {
+                host: masterHost,
+                port,
+                username,
+                password,
+                database,
+              },
+              slaves: replicas.map(replica => ({
+                host: replica,
+                port,
+                username,
+                password,
+                database,
+              })),
+            },
+            autoLoadEntities: true,
+            synchronize: true,
+            legacySpatialSupport: false,
+            namingStrategy: new FbwNamingStrategy(),
+            logging: configService.get('database.logging'),
+            extra: {
+              connectionLimit: configService.get<number>('database.connectionLimit'),
+            }
+          }
         }
-      }),
+
+        return {
+          type: 'mysql',
+          host: masterHost,
+          port,
+          username,
+          password,
+          database,
+          autoLoadEntities: true,
+          synchronize: true,
+          legacySpatialSupport: false,
+          namingStrategy: new FbwNamingStrategy(),
+          logging: configService.get('database.logging'),
+          extra: {
+            connectionLimit: configService.get<number>('database.connectionLimit'),
+          }
+        }
+      },
     }),
     ConfigModule.forRoot({
       isGlobal: true,
