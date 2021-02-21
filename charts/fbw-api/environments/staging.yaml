@@ -11,6 +11,7 @@ api:
     database: fbw_api_staging
     user: fbw_api_staging
     replicas:
+      - private-mysql-flybywiresim-do-user-8167919-0.b.db.ondigitalocean.com
       - private-mysql-flybywiresim-read-only-83073-do-user-8167919-0.b.db.ondigitalocean.com
   redis:
     host: redis-staging-master.redis-staging.svc.cluster.local
