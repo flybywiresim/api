@@ -24,6 +24,11 @@ export class AirportService {
     let foundAirport: any;
 
     const cacheHit = await this.cache.get<Airport>(`/api/v1/airport/${icao}`);
+    const cacheError = await this.cache.get<boolean>(`upstream-error:/api/v1/airport/${icao}`);
+    if (cacheError) {
+      throw new HttpException(`Airport with ICAO '${icaoCode}' not found`, 404);
+    }
+
     if (!cacheHit) {
       try {
         response = await this.http.get<any>(`https://ourairportapi.com/airport/${icaoCode}?expand=false`).toPromise();
@@ -35,7 +40,7 @@ export class AirportService {
 
       if (response.data.errorMessage || response.data.count > 1) {
         // Cache upstream 404s for 1 day
-        this.cache.set(`/api/v1/airport/${icao}`, { icao }, 86400).then(); // 1 days
+        this.cache.set(`upstream-error:/api/v1/airport/${icao}`, true, 86400).then(); // 1 day
         throw new HttpException(`Airport with ICAO '${icaoCode}' not found`, 404);
       }
 
