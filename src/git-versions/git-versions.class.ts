@@ -19,6 +19,17 @@ export class ReleaseInfo {
   htmlUrl: string;
 }
 
+export class PullLabel {
+  @ApiProperty({ description: 'The unique identifier of the label', example: 'MDU6TGFiZWwyMzQ1OTA5MjAz' })
+  id: string;
+
+  @ApiProperty({ description: 'The name of the label', example: ['Ready to Test', 'QA Tier 2']})
+  name: string;
+
+  @ApiProperty({ description: 'The hex color of the label', example: 'd93f0b' })
+  color: string;
+}
+
 export class PullInfo {
   @ApiProperty({ description: 'The number of the PR', example: '3176' })
   number: number;
@@ -29,8 +40,8 @@ export class PullInfo {
   @ApiProperty({ description: 'The username of the author', example: 'tyler58546' })
   author: string;
 
-  @ApiProperty({ description: 'The labels on the PR', example: ['Ready to Test', 'QA Tier 2']})
-  labels: string[];
+  @ApiProperty({ description: 'The labels on the PR' })
+  labels: PullLabel[];
 
   @ApiProperty({ description: 'Whether the PR is still a draft' })
   isDraft: boolean;
