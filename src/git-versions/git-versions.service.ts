@@ -79,7 +79,7 @@ export class GitVersionsService {
 
     return this.http.post<any>('https://api.github.com/graphql', {
       query: `{repository(owner:"${user}",name:"${repo}"){pullRequests(first:100,states:OPEN)
-      {nodes{number title state isDraft author{login}labels(first:10){nodes{name}}}}}}`
+      {nodes{number title state isDraft author{login}labels(first:10){nodes{name color id}}}}}}`
     }, {
       headers: this.headers
     })
@@ -93,7 +93,7 @@ export class GitVersionsService {
               number: pull.number,
               title: pull.title,
               author: pull.author.login,
-              labels: pull.labels.nodes.map(label => label.name),
+              labels: pull.labels.nodes,
               isDraft: pull.isDraft
             })
           })
