@@ -146,7 +146,7 @@ export class TelexService {
     const matches = await this.connectionRepository
       .createQueryBuilder()
       .select()
-      .andWhere(`flight LIKE '${query}%'`)
+      .andWhere(`UPPER(flight) LIKE UPPER('${query}%')`)
       .andWhere('isActive = 1')
       .orderBy('flight', 'ASC')
       .limit(50)

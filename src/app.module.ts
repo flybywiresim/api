@@ -9,8 +9,6 @@ import { TelexModule } from './telex/telex.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TafController } from './taf/taf.controller';
 import { TafService } from './taf/taf.service';
-import { ChartsController } from './charts/charts.controller';
-import { ChartsService } from './charts/charts.service';
 import configuration from './config/configuration';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FbwNamingStrategy } from './utilities/db-naming';
@@ -20,6 +18,7 @@ import * as winston from 'winston';
 import { HealthModule } from './health/health.module';
 import { AirportModule } from './airport/airport.module';
 import { GitVersionsModule } from './git-versions/git-versions.module';
+import { ChartsModule } from './charts/charts.module';
 
 @Module({
   imports: [
@@ -114,15 +113,15 @@ import { GitVersionsModule } from './git-versions/git-versions.module';
     HealthModule,
     AirportModule,
     GitVersionsModule,
+    ChartsModule,
   ],
   controllers: [
     AppController,
     MetarController,
     AtisController,
-    TafController,
-    ChartsController
+    TafController
   ],
-  providers: [MetarService, AtisService, TafService, ChartsService],
+  providers: [MetarService, AtisService, TafService],
 })
 export class AppModule {
 }

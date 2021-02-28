@@ -5,7 +5,7 @@ import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/s
 import { Observable } from 'rxjs';
 
 @ApiTags('Charts')
-@Controller('charts')
+@Controller('api/v1/charts')
 @UseInterceptors(CacheInterceptor)
 export class ChartsController {
   constructor(private charts: ChartsService) {
