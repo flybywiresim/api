@@ -54,6 +54,14 @@ export class GitVersionsService {
   getReleases(user: string, repo: string): Observable<ReleaseInfo[]> {
     this.logger.debug(`Trying to fetch releases for ${user}/${repo}`);
 
+    const releaseInfos: ReleaseInfo[] = [{
+      name: 'stable',
+      publishedAt: new Date(),
+      htmlUrl: ''
+    }];
+
+    return of(releaseInfos);
+
     return this.http.get<any>(`https://api.github.com/repos/${user}/${repo}/releases`, {
       headers: this.headers
     })
