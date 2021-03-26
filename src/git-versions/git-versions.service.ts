@@ -1,5 +1,5 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ArtifactInfo, CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
 import { catchError, map, tap } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
@@ -24,13 +24,6 @@ export class GitVersionsService {
   getCommitOfBranch(user: string, repo: string, branch: string): Observable<CommitInfo> {
     this.logger.debug(`Trying to fetch commit info for ${user}/${repo}/refs/${branch}`);
 
-    const commitInfo: CommitInfo = {
-      sha: '',
-      timestamp: new Date()
-    };
-
-    return of(commitInfo);
-
     return this.http.get<any>(`https://api.github.com/repos/${user}/${repo}/commits/${branch}`, {
       headers: this.headers
     })
@@ -53,14 +46,6 @@ export class GitVersionsService {
 
   getReleases(user: string, repo: string): Observable<ReleaseInfo[]> {
     this.logger.debug(`Trying to fetch releases for ${user}/${repo}`);
-
-    const releaseInfos: ReleaseInfo[] = [{
-      name: 'stable',
-      publishedAt: new Date(),
-      htmlUrl: ''
-    }];
-
-    return of(releaseInfos);
 
     return this.http.get<any>(`https://api.github.com/repos/${user}/${repo}/releases`, {
       headers: this.headers
