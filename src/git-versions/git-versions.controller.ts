@@ -1,7 +1,6 @@
 import { CacheInterceptor, CacheTTL, Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GitVersionsService } from './git-versions.service';
-import { Observable } from 'rxjs';
 import { ArtifactInfo, CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
 
 @ApiTags('Git Versions')
@@ -17,8 +16,15 @@ export class GitVersionsController {
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
   @ApiParam({ name: 'branch', description: 'The target branch', example: 'master' })
   @ApiOkResponse({ description: 'The newest commit on the branch', type: CommitInfo })
-  getCommitOfBranch(@Param('user') user: string, @Param('repo') repo: string, @Param('branch') branch: string): Observable<CommitInfo> {
-    return this.service.getCommitOfBranch(user, repo, branch);
+  async getCommitOfBranch(@Param('user') user: string, @Param('repo') repo: string, @Param('branch') branch: string): Promise<CommitInfo> {
+    try {
+      return await this.service.getCommitOfBranch(user, repo, branch).toPromise();
+    } catch (e) {
+      return {
+        sha: '',
+        timestamp: new Date(),
+      };
+    }
   }
 
   @Get(':user/:repo/releases')
@@ -26,8 +32,12 @@ export class GitVersionsController {
   @ApiParam({ name: 'user', description: 'The owner of the repository', example: 'flybywiresim' })
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
   @ApiOkResponse({ description: 'The newest commit on the branch', type: [ReleaseInfo]})
-  getReleases(@Param('user') user: string, @Param('repo') repo: string): Observable<ReleaseInfo[]> {
-    return this.service.getReleases(user, repo);
+  async getReleases(@Param('user') user: string, @Param('repo') repo: string): Promise<ReleaseInfo[]> {
+    try {
+      return await this.service.getReleases(user, repo).toPromise();
+    } catch (e) {
+      return [];
+    }
   }
 
   @Get(':user/:repo/pulls')
@@ -35,8 +45,12 @@ export class GitVersionsController {
   @ApiParam({ name: 'user', description: 'The owner of the repository', example: 'flybywiresim' })
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
   @ApiOkResponse({ description: 'The newest commit on the branch', type: [PullInfo]})
-  getPulls(@Param('user') user: string, @Param('repo') repo: string): Observable<PullInfo[]> {
-    return this.service.getPulls(user, repo);
+  async getPulls(@Param('user') user: string, @Param('repo') repo: string): Promise<PullInfo[]> {
+    try {
+      return await this.service.getPulls(user, repo).toPromise();
+    } catch (e) {
+      return [];
+    }
   }
 
   @Get(':user/:repo/pulls/:pull/artifact')
@@ -45,8 +59,14 @@ export class GitVersionsController {
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
   @ApiParam({ name: 'pull', description: 'The number of the PR', example: '3295' })
   @ApiOkResponse({ description: 'The artifact URL for this PR', type: ArtifactInfo })
-  getArtifact(@Param('user') user: string, @Param('repo') repo: string, @Param('pull') pull: string): Promise<ArtifactInfo> {
-    return this.service.getArtifactForPull(user, repo, pull);
+  async getArtifact(@Param('user') user: string, @Param('repo') repo: string, @Param('pull') pull: string): Promise<ArtifactInfo> {
+    try {
+      return await this.service.getArtifactForPull(user, repo, pull);
+    } catch (e) {
+      return {
+        artifactUrl: '',
+      };
+    }
   }
 
 }
