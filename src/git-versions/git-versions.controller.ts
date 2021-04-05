@@ -1,5 +1,5 @@
-import { CacheInterceptor, CacheTTL, Controller, Get, Param, UseInterceptors } from '@nestjs/common';
-import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
+import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GitVersionsService } from './git-versions.service';
 import { ArtifactInfo, CommitInfo, PullInfo, ReleaseInfo } from './git-versions.class';
 
@@ -31,10 +31,21 @@ export class GitVersionsController {
   @CacheTTL(300)
   @ApiParam({ name: 'user', description: 'The owner of the repository', example: 'flybywiresim' })
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
+  @ApiQuery({
+    name: 'includePreReleases',
+    description: 'Whether to include pre-releases in the list',
+    required: false,
+    enum: ['true', 'false'],
+    schema: { default: false }
+  })
   @ApiOkResponse({ description: 'The newest commit on the branch', type: [ReleaseInfo]})
-  async getReleases(@Param('user') user: string, @Param('repo') repo: string): Promise<ReleaseInfo[]> {
+  async getReleases(
+    @Param('user') user: string,
+    @Param('repo') repo: string,
+    @Query('includePreReleases') includePre: string
+  ): Promise<ReleaseInfo[]> {
     try {
-      return await this.service.getReleases(user, repo).toPromise();
+      return await this.service.getReleases(user, repo, includePre === undefined ? false : includePre === 'true').toPromise();
     } catch (e) {
       return [];
     }

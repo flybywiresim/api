@@ -44,7 +44,7 @@ export class GitVersionsService {
       );
   }
 
-  getReleases(user: string, repo: string): Observable<ReleaseInfo[]> {
+  getReleases(user: string, repo: string, includePreReleases: boolean): Observable<ReleaseInfo[]> {
     this.logger.debug(`Trying to fetch releases for ${user}/${repo}`);
 
     return this.http.get<any>(`https://api.github.com/repos/${user}/${repo}/releases`, {
@@ -55,7 +55,7 @@ export class GitVersionsService {
         map(response => {
           const releases: ReleaseInfo[] = [];
 
-          response.data.forEach(rel => {
+          response.data.filter(rel => includePreReleases || !rel.prerelease).forEach(rel => {
             releases.push({
               name: rel.name,
               htmlUrl: rel.html_url,
