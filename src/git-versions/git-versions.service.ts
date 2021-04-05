@@ -60,6 +60,7 @@ export class GitVersionsService {
               name: rel.name,
               htmlUrl: rel.html_url,
               publishedAt: rel.published_at,
+              body: rel.body,
             })
           })
 
