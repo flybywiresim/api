@@ -75,12 +75,12 @@ export class AtisService {
       this.logger.debug('Returning from cache');
       return cacheHit;
     } else {
-      const data = await this.http.get<any>('http://cluster.data.vatsim.net/vatsim-data.json')
+      const data = await this.http.get<any>('https://data.vatsim.net/v3/vatsim-data.json')
         .pipe(
           tap(response => this.logger.debug(`Response status ${response.status} for VATSIM ATIS request`)),
-          tap(response => this.logger.debug(`Response contains ${response.data.clients.length} entries`)),
+          tap(response => this.logger.debug(`Response contains ${response.data.atis.length} entries`)),
           map(response => {
-            return response.data;
+            return response.data.atis;
           }),
         ).toPromise();
 
@@ -90,14 +90,16 @@ export class AtisService {
   }
 
   private handleVatsim(icao: string): Promise<Atis> {
+
     return this.fetchVatsimBlob()
       .then(response => {
         return {
           icao,
           source: 'Vatsim',
-          combined: response.clients
-            .find(x => x.callsign === icao + '_ATIS').atis_message
-            .replace(/\^§/g, ' ')
+          combined: response
+            .find(x => x.callsign === icao + '_ATIS')
+            .text_atis
+            .join(' ')
             .toUpperCase(),
         };
       })
