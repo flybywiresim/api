@@ -27,7 +27,7 @@ export class TelexConnection {
 
   @Column({ update: false })
   @Index()
-  @ApiProperty({ description: 'The flight number', example: 'OS 355' })
+  @ApiProperty({ description: 'The flight number', example: 'OS355' })
   flight: string;
 
   @Column({
