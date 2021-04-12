@@ -13,7 +13,7 @@ import * as Filter from 'bad-words';
 import { Cron } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
-import { Token } from '../auth/token.class';
+import { FlightToken } from '../auth/flights/flight-token.class';
 import { BannedFlightNumbers, MessageFilters } from './filters';
 import { PaginationDto } from 'src/common/Pagination';
 import { BoundsDto } from '../common/Bounds';
@@ -57,7 +57,7 @@ export class TelexService {
 
   // ======= Connection Handling ======= //
 
-  async addNewConnection(connection: TelexConnectionDto): Promise<Token> {
+  async addNewConnection(connection: TelexConnectionDto): Promise<FlightToken> {
     this.logger.log(`Trying to register new flight '${connection.flight}'`);
 
     if (BannedFlightNumbers.includes(connection.flight.toUpperCase())) {

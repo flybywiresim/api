@@ -28,8 +28,8 @@ import {
   ApiParam, ApiQuery, ApiSecurity,
   ApiTags
 } from '@nestjs/swagger';
-import { Token } from '../auth/token.class';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FlightToken } from '../auth/flights/flight-token.class';
+import { FlightAuthGuard } from '../auth/flights/flight-auth-guard.service';
 import { PaginationDto } from 'src/common/Pagination';
 import { BoundsDto } from '../common/Bounds';
 
@@ -119,14 +119,14 @@ export class TelexConnectionController {
     description: 'The new connection containing the flight number and current location',
     type: TelexConnectionDto
   })
-  @ApiCreatedResponse({ description: 'A flight got created', type: Token })
+  @ApiCreatedResponse({ description: 'A flight got created', type: FlightToken })
   @ApiBadRequestResponse({ description: 'An active flight with the given flight number is already in use' })
-  async addNewConnection(@Body() body: TelexConnectionDto): Promise<Token> {
+  async addNewConnection(@Body() body: TelexConnectionDto): Promise<FlightToken> {
     return await this.telex.addNewConnection(body);
   }
 
   @Put()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(FlightAuthGuard)
   @ApiSecurity('jwt')
   @ApiBody({ description: 'The updated connection containing the current location', type: TelexConnectionUpdateDto })
   @ApiOkResponse({ description: 'The connection got updated', type: TelexConnection })
@@ -136,7 +136,7 @@ export class TelexConnectionController {
   }
 
   @Delete()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(FlightAuthGuard)
   @ApiSecurity('jwt')
   @ApiOkResponse({ description: 'The connection got disabled' })
   @ApiNotFoundResponse({ description: 'The connection with the given ID could not be found' })

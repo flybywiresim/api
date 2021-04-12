@@ -8,7 +8,7 @@ import {
   ApiOkResponse, ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { FlightAuthGuard } from '../auth/flights/flight-auth-guard.service';
 
 @ApiTags('TELEX')
 @Controller('txmsg')
@@ -17,7 +17,7 @@ export class TelexMessageController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(FlightAuthGuard)
   @ApiSecurity('jwt')
   @ApiBody({ description: 'The message to send', type: TelexMessageDto })
   @ApiCreatedResponse({ description: 'The message could be addressed', type: TelexMessage })
@@ -27,7 +27,7 @@ export class TelexMessageController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(FlightAuthGuard)
   @ApiSecurity('jwt')
   @ApiOkResponse({ description: 'Open messages for the recipient. Will get automatically acknowledged', type: [TelexMessage]})
   async getMessagesForConnection(@Request() req): Promise<TelexMessage[]> {
