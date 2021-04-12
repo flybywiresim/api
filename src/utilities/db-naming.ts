@@ -1,16 +1,15 @@
 import { DefaultNamingStrategy, Table, NamingStrategyInterface } from 'typeorm';
 
 export class FbwNamingStrategy extends DefaultNamingStrategy implements NamingStrategyInterface {
-  foreignKeyName(tableOrName: Table | string, columnNames: string[], referencedTablePath?: string, referencedColumnNames?: string[]): string {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    foreignKeyName(tableOrName: Table | string, columnNames: string[], referencedTablePath?: string, referencedColumnNames?: string[]): string {
+        tableOrName = typeof tableOrName === 'string' ? tableOrName : tableOrName.name;
 
-    tableOrName =
-      typeof tableOrName === 'string' ? tableOrName : tableOrName.name;
+        const name = columnNames.reduce(
+            (name, column) => `${name}_${column}`,
+            `${tableOrName}_${referencedTablePath}`,
+        );
 
-    const name = columnNames.reduce(
-      (name, column) => `${name}_${column}`,
-      `${tableOrName}_${referencedTablePath}`,
-    );
-
-    return`fk_${name}`;
-  }
+        return `fk_${name}`;
+    }
 }

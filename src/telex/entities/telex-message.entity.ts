@@ -1,7 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { TelexConnection } from './telex-connection.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { TelexConnection } from './telex-connection.entity';
 
 @Entity()
 export class TelexMessage {
@@ -26,22 +25,12 @@ export class TelexMessage {
   isProfane: boolean;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne(type => TelexConnection, x => x.id, { eager: true })
+  @ManyToOne((type) => TelexConnection, (x) => x.id, { eager: true })
   @ApiProperty({ description: 'The sender connection' })
   from: TelexConnection;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne(type => TelexConnection, x => x.id, { eager: true })
+  @ManyToOne((type) => TelexConnection, (x) => x.id, { eager: true })
   @ApiProperty({ description: 'The recipient connection' })
   to: TelexConnection;
-}
-
-export class TelexMessageDto {
-  @IsNotEmpty()
-  @ApiProperty({ description: 'The number of the recipient flight', example: 'OS 355' })
-  to: string;
-
-  @IsNotEmpty()
-  @ApiProperty({ description: 'The message to send', example: 'Hello over there!' })
-  message: string;
 }

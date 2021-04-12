@@ -4,7 +4,7 @@ import { Controller, Get, Redirect } from '@nestjs/common';
 export class AppController {
   @Get()
   @Redirect('/api/#', 301)
-  documentation() {
-    return;
-  }
+    documentation() {
+
+    }
 }

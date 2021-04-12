@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-
 export class FlightToken {
   @ApiProperty({ description: 'The access token for secured endpoints' })
   accessToken: string;

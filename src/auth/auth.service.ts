@@ -4,16 +4,16 @@ import { FlightToken } from './flights/flight-token.class';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwtService: JwtService
-  ) {}
+    constructor(
+    private jwtService: JwtService,
+    ) {}
 
-  login(flight: string, connectionId: string): FlightToken {
-    const payload = { flight, sub: connectionId };
-    return {
-      accessToken: this.jwtService.sign(payload),
-      flight: flight,
-      connection: connectionId,
-    };
-  }
+    login(flight: string, connectionId: string): FlightToken {
+        const payload = { flight, sub: connectionId };
+        return {
+            accessToken: this.jwtService.sign(payload),
+            flight,
+            connection: connectionId,
+        };
+    }
 }
