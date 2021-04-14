@@ -5,8 +5,8 @@ ENV NODE_ENV=development
 
 COPY package*.json ./
 COPY tsconfig*.json ./
-COPY .eslintrc.js ./
-COPY .prettierrc ./
+COPY .eslintrc.json ./
+COPY .eslintignore ./
 
 RUN npm install -g @nestjs/cli
 RUN npm install
