@@ -8,7 +8,7 @@ export class AuthService {
     private jwtService: JwtService,
     ) {}
 
-    login(flight: string, connectionId: string): FlightToken {
+    registerFlight(flight: string, connectionId: string): FlightToken {
         const payload = { flight, sub: connectionId };
         return {
             accessToken: this.jwtService.sign(payload),

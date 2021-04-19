@@ -80,7 +80,7 @@ export class TelexService {
       this.logger.log(`Registering new flight '${connection.flight}'`);
       await this.connectionRepository.save(newFlight);
 
-      return this.authService.login(newFlight.flight, newFlight.id);
+      return this.authService.registerFlight(newFlight.flight, newFlight.id);
   }
 
   async updateConnection(connectionId: string, connection: UpdateTelexConnectionDto): Promise<TelexConnection> {
