@@ -5,8 +5,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class AirportAugmentation {
   @PrimaryGeneratedColumn()
   @ApiProperty({
-    description: 'The unique identifier of the airport',
-    example: '1234',
+      description: 'The unique identifier of the airport',
+      example: '1234',
   })
   id?: number;
 

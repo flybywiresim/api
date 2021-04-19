@@ -3,8 +3,8 @@ import { ChartsController } from './charts.controller';
 import { ChartsService } from './charts.service';
 
 @Module({
-  imports: [HttpModule],
-  providers: [ChartsService],
-  controllers: [ChartsController]
+    imports: [HttpModule],
+    providers: [ChartsService],
+    controllers: [ChartsController],
 })
 export class ChartsModule {}

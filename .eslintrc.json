@@ -1,0 +1,39 @@
+{
+  "root": true,
+  "env": { "browser": true },
+  "extends": "@flybywiresim/eslint-config",
+  "plugins": ["@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "script",
+    "requireConfigFile": false
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": ["*.mjs", "*.ts", "*.d.ts"],
+      "parserOptions": { "sourceType": "module" }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "no-undef": "off"
+      }
+    }
+  ],
+  // overrides airbnb, use sparingly
+  "rules": {
+    "object-curly-newline": ["error", { "multiline": true }],
+
+    // Required for dependency injection
+    "no-useless-constructor": "off",
+    "no-empty-function": "off"
+  }
+}

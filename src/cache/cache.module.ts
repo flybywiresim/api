@@ -5,23 +5,23 @@ import { CacheService } from './cache.service';
 
 @Global()
 @Module({
-  imports: [
-    NestCache.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('redis.host'),
-        port: configService.get<number>('redis.port'),
-      }),
-    }),
-  ],
-  providers: [
-    CacheService,
-  ],
-  exports: [
-    NestCache,
-    CacheService,
-  ],
+    imports: [
+        NestCache.registerAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+                store: redisStore,
+                host: configService.get('redis.host'),
+                port: configService.get<number>('redis.port'),
+            }),
+        }),
+    ],
+    providers: [
+        CacheService,
+    ],
+    exports: [
+        NestCache,
+        CacheService,
+    ],
 })
 export class CacheModule {}
