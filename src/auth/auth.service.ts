@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Octokit } from '@octokit/core';
-import { createOAuthUserAuth } from '@octokit/auth-oauth-user';
 import { FlightToken } from './flights/flight-token.class';
 
 @Injectable()
@@ -10,6 +8,7 @@ export class AuthService {
     constructor(
         private jwtService: JwtService,
         private configService: ConfigService,
+        private http: HttpService,
     ) {}
 
     registerFlight(flight: string, connectionId: string): FlightToken {
@@ -21,18 +20,31 @@ export class AuthService {
         };
     }
 
-    async authAdminUser(code: string): Promise<string> {
-        const octokit = new Octokit({
-            authStrategy: createOAuthUserAuth,
-            auth: {
-                clientId: this.configService.get('auth.gitHubOAuthClientId'),
-                clientSecret: this.configService.get('auth.gitHubOAuthClientSecret'),
+    async authAdminUser(code: string) {
+        const clientId = this.configService.get('auth.gitHubOAuthClientId');
+        const clientSecret = this.configService.get('auth.gitHubOAuthClientSecret');
+
+        const resp = await this.http.get('https://github.com/login/oauth/access_token', {
+            method: 'post',
+            responseType: 'json',
+            headers: { Accept: 'application/json' },
+            params: {
+                client_id: clientId,
+                client_secret: clientSecret,
                 code,
             },
-        });
+        }).toPromise();
 
-        const { data: { login } } = await octokit.request('GET /user');
+        const token = resp.data.access_token;
 
-        return login;
+        if (typeof token !== 'undefined') {
+            const resp = await this.http.get('https://api.github.com/user', { headers: { Authorization: `Bearer ${token}` }, responseType: 'json' }).toPromise();
+
+            console.log(resp.data);
+
+            return resp.data;
+        }
+
+        return Promise.reject(Error('No Token'));
     }
 }
