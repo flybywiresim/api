@@ -33,8 +33,6 @@
     "@nestjs/swagger": "^4.6.1",
     "@nestjs/terminus": "^7.0.1",
     "@nestjs/typeorm": "^7.1.4",
-    "@octokit/auth-oauth-user": "^1.2.4",
-    "@octokit/core": "^3.4.0",
     "axios": "^0.20.0",
     "bad-words": "^3.0.3",
     "cache-manager": "^3.4.0",
