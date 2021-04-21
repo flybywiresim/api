@@ -26,6 +26,8 @@ export default () => ({
         timeoutMin: parseInt(process.env.TELEX_TIMEOUT_MIN) || 6,
     },
     auth: {
+        gitHubOAuthClientId: envOrFile('GITHUB_CLIENT_ID', './secrets/github_client_id.txt') || '',
+        gitHubOAuthClientSecret: envOrFile('GITHUB_CLIENT_SECRET', './secrets/github_client_secret.txt') || '',
         secret: envOrFile('AUTH_SECRET', './secrets/jwt_secret.txt') || 'FlyByWire',
         expires: process.env.AUTH_EXPIRES || '12h',
     },

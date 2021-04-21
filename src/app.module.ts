@@ -19,6 +19,7 @@ import { HealthModule } from './health/health.module';
 import { AirportModule } from './airport/airport.module';
 import { GitVersionsModule } from './git-versions/git-versions.module';
 import { ChartsModule } from './charts/charts.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
     imports: [
@@ -107,6 +108,7 @@ import { ChartsModule } from './charts/charts.module';
         AirportModule,
         GitVersionsModule,
         ChartsModule,
+        AdminModule,
     ],
     controllers: [
         AppController,
