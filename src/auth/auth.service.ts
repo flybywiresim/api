@@ -20,7 +20,7 @@ export class AuthService {
         };
     }
 
-    async authAdminUser(code: string) {
+    async authAdminUser(res, code: string): Promise<string> {
         const clientId = this.configService.get('auth.gitHubOAuthClientId');
         const clientSecret = this.configService.get('auth.gitHubOAuthClientSecret');
 
@@ -38,11 +38,22 @@ export class AuthService {
         const token = resp.data.access_token;
 
         if (typeof token !== 'undefined') {
-            const resp = await this.http.get('https://api.github.com/user', { headers: { Authorization: `Bearer ${token}` }, responseType: 'json' }).toPromise();
+            const resp = await this.http.get('https://api.github.com/user', {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'json',
+            }).toPromise();
 
-            console.log(resp.data);
+            const { data } = resp;
 
-            return resp.data;
+            if (typeof data !== 'undefined') {
+                const jwtPayload = { id: data.id };
+
+                const jwt = this.jwtService.sign(jwtPayload, { expiresIn: '1y' });
+
+                return jwt;
+            }
+
+            return Promise.reject(Error('No User Data'));
         }
 
         return Promise.reject(Error('No Token'));

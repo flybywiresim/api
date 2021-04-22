@@ -9,13 +9,15 @@ export class AdminService {
         private readonly configService: ConfigService,
     ) {}
 
-    async authenticate(res, code: string | undefined) {
+    async authenticate(res, code: string | undefined): Promise<string> {
         if (typeof code !== 'undefined') {
-            return this.authService.authAdminUser(code);
+            return this.authService.authAdminUser(res, code);
         }
 
         const clientId = this.configService.get('auth.gitHubOAuthClientId');
 
-        return res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientId}`);
+        const scope = 'read:user read:org';
+
+        return res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scope}`);
     }
 }
