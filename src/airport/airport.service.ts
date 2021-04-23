@@ -54,6 +54,7 @@ export class AirportService {
           const [foundAirport] = response.data.results;
           const augmentedAirport = {
               icao: foundAirport.icao,
+              iata: foundAirport.iata,
               type: foundAirport.type,
               name: foundAirport.name,
               lat: foundAirport.lat,
