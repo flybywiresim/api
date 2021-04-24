@@ -4,6 +4,9 @@ export class Airport {
     @ApiProperty({ description: 'The airport ICAO', example: 'KLAX' })
     icao: string;
 
+    @ApiProperty({ description: 'The airport IATA', example: 'LAX' })
+    iata: string;
+
     @ApiProperty({ description: 'The type of the airport', enum: ['large_airport', 'medium_airport', 'small_airport'] })
     type: string;
 
