@@ -1,9 +1,12 @@
-import { Logger, Module } from '@nestjs/common';
+import { HttpModule, Logger, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FlightStrategy } from './flights/flight.strategy';
 import { AuthService } from './auth.service';
+import { GithubJwtStrategy } from './oauth/github-jwt-strategy.service';
+import { OauthService } from './oauth/oauth.service';
+import { OauthController } from './oauth/oauth.controller';
 
 @Module({
     imports: [
@@ -17,9 +20,11 @@ import { AuthService } from './auth.service';
             }),
             inject: [ConfigService],
         }),
+        HttpModule,
     ],
-    providers: [AuthService, FlightStrategy],
+    providers: [AuthService, FlightStrategy, GithubJwtStrategy, OauthService],
     exports: [AuthService],
+    controllers: [OauthController],
 })
 export class AuthModule {
   private readonly logger = new Logger(AuthModule.name);
