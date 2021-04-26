@@ -1,5 +1,4 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RedirectDetails } from '../../utilities/redirect-details';
 import { TokenPair } from '../token-pair.class';
@@ -23,7 +22,7 @@ export class OauthService {
 
         return {
             url: `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=${scope}&state=${state}`,
-            stausCode: 302,
+            statusCode: 302,
         };
     }
 

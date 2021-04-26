@@ -1,4 +1,4 @@
 export interface RedirectDetails {
     url: string,
-    stausCode: number,
+    statusCode: number,
 }

@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { FlightStrategy } from './flights/flight.strategy';
 import { AuthService } from './auth.service';
+import { GithubJwtStrategy } from './oauth/github-jwt-strategy.service';
 import { OauthService } from './oauth/oauth.service';
 import { OauthController } from './oauth/oauth.controller';
 
@@ -21,7 +22,7 @@ import { OauthController } from './oauth/oauth.controller';
         }),
         HttpModule,
     ],
-    providers: [AuthService, FlightStrategy, OauthService],
+    providers: [AuthService, FlightStrategy, GithubJwtStrategy, OauthService],
     exports: [AuthService],
     controllers: [OauthController],
 })
