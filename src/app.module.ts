@@ -19,6 +19,8 @@ import { HealthModule } from './health/health.module';
 import { AirportModule } from './airport/airport.module';
 import { GitVersionsModule } from './git-versions/git-versions.module';
 import { ChartsModule } from './charts/charts.module';
+import { VatsimController } from './vatsim/vatsim.controller';
+import { VatsimService } from './vatsim/vatsim.service';
 
 @Module({
     imports: [
@@ -109,12 +111,13 @@ import { ChartsModule } from './charts/charts.module';
         ChartsModule,
     ],
     controllers: [
+        VatsimController,
         AppController,
         MetarController,
         AtisController,
         TafController,
     ],
-    providers: [MetarService, AtisService, TafService],
+    providers: [MetarService, AtisService, TafService, VatsimService],
 })
 export class AppModule {
 }
