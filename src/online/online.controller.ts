@@ -11,7 +11,6 @@ import {
     ApiQuery,
     ApiTags,
 } from '@nestjs/swagger';
-import { exception } from 'console';
 import { ATCInfo } from './atc-info.class';
 import { VatsimService } from './vatsim.service';
 
