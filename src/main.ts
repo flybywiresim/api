@@ -27,7 +27,7 @@ async function bootstrap() {
     app.enableCors();
 
     // Request param/body/query validation
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true })); 
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
     // Rate limiter
     app.use(
