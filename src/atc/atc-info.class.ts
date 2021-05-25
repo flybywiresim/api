@@ -12,7 +12,7 @@ export enum AtcType {
 
 export class ATCInfo {
   @ApiProperty({ description: 'The atc callsign', example: 'EBBR_TWR' })
-  callsign:string;
+  callsign: string;
 
   @ApiProperty({ description: 'The atc frequency', example: '128.800' })
   frequency:string;
