@@ -12,15 +12,15 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { ATCInfo } from './atc-info.class';
-import { VatsimService } from './vatsim.service';
+import { AtcService } from './atc.service';
 
-@ApiTags('ONLINE')
-@Controller('online')
+@ApiTags('ATC')
+@Controller('atc')
 @UseInterceptors(CacheInterceptor)
-export class OnlineController {
-    constructor(private vatsimService: VatsimService) {}
+export class AtcController {
+    constructor(private atcService: AtcService) {}
 
-    @Get('atc')
+    @Get('')
     @CacheTTL(120)
     @ApiQuery({
         name: 'source',
@@ -32,10 +32,10 @@ export class OnlineController {
     @ApiOkResponse({ description: 'list of connected atc', type: ATCInfo })
     async getControllers(@Query('source') source?: string): Promise<ATCInfo[]> {
         if (source === 'vatsim') {
-            return this.vatsimService.getControllers();
+            return this.atcService.getVatsimControllers();
         }
         if (source === 'ivao') {
-            return [];
+            return this.atcService.getIvaoControllers();
         }
         return null;
     }

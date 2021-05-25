@@ -1,5 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export enum AtcType {
+  unknow,
+  delivery,
+  ground,
+  tower,
+  departure,
+  approach,
+  radar
+}
+
 export class ATCInfo {
   @ApiProperty({ description: 'The atc callsign', example: 'EBBR_TWR' })
   callsign:string;
@@ -14,7 +24,7 @@ export class ATCInfo {
   textAtis: string[];
 
   @ApiProperty({ description: 'The atc type', example: 'GND' })
-  type:string;
+  type:AtcType;
 
   @ApiProperty({ description: 'The atc latitude', example: 32.08420727935125 })
   latitude?: number;
