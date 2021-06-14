@@ -15,16 +15,16 @@ export class ATCInfo {
   callsign: string;
 
   @ApiProperty({ description: 'The atc frequency', example: '128.800' })
-  frequency:string;
+  frequency: string;
 
   @ApiProperty({ description: 'The atc visual range', example: 150 })
-  visualRange:number;
+  visualRange: number;
 
   @ApiProperty({ description: 'The atc current ATIS', example: ['line 1', 'line2', 'line3'] })
   textAtis: string[];
 
   @ApiProperty({ description: 'The atc type', example: 'GND' })
-  type:AtcType;
+  type: AtcType;
 
   @ApiProperty({ description: 'The atc latitude', example: 32.08420727935125 })
   latitude?: number;
