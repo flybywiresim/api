@@ -17,16 +17,19 @@ export class AtcService {
             if (atcType !== AtcType.unknow) {
                 const trans = transceivers.find((t) => t.callsign === c.callsign);
                 const position = this.getCenterOfCoordinates(trans?.transceivers);
+                const freqency = this.getFrequency(trans?.transceivers);
 
-                arr.push({
-                    callsign: c.callsign,
-                    frequency: c.frequency,
-                    textAtis: c.text_atis,
-                    visualRange: c.visual_range,
-                    type: this.callSignToAtcType(c.callsign),
-                    latitude: position ? position[0] : null,
-                    longitude: position ? position[1] : null,
-                });
+                if (freqency) {
+                    arr.push({
+                        callsign: c.callsign,
+                        frequency: freqency,
+                        textAtis: c.text_atis,
+                        visualRange: c.visual_range,
+                        type: this.callSignToAtcType(c.callsign),
+                        latitude: position ? position[0] : null,
+                        longitude: position ? position[1] : null,
+                    });
+                }
             }
         }
 
@@ -84,6 +87,15 @@ export class AtcService {
             return AtcType.tower;
         }
         return AtcType.unknow;
+    }
+
+    public getFrequency(array:any[]):string {
+        if (array && array.length > 0 && array[0].frequency) {
+            let freqInString : string = array[0].frequency.toString();
+            freqInString = `${freqInString.substr(0, 3)}.${freqInString.substr(3)}`;
+            return parseFloat(freqInString).toFixed(3);
+        }
+        return null;
     }
 
     public getCenterOfCoordinates(array: any[]) {
