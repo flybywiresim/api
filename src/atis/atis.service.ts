@@ -1,20 +1,19 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { VatsimService } from 'src/utilities/vatsim.service';
+import { IvaoService } from 'src/utilities/ivao.service';
 import { Atis } from './atis.class';
 import { CacheService } from '../cache/cache.service';
-
-// TODO: investigate
-// For some reason iconv is not working with import
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const iconv = require('iconv-lite');
 
 @Injectable()
 export class AtisService {
   private readonly logger = new Logger(AtisService.name);
 
   constructor(private http: HttpService,
-              private readonly cache: CacheService) {
+              private readonly cache: CacheService,
+              private readonly vatsim: VatsimService,
+                private readonly ivao : IvaoService) {
   }
 
   getForICAO(icao: string, source?: string): Promise<Atis> {
@@ -67,31 +66,12 @@ export class AtisService {
           );
   }
 
-  // Vatsim
-  private async fetchVatsimBlob(): Promise<any> {
-      const cacheHit = await this.cache.get('/atis/blob/vatsim');
-
-      if (cacheHit) {
-          this.logger.debug('Returning from cache');
-          return cacheHit;
-      }
-      const data = await this.http.get<any>('https://data.vatsim.net/v3/vatsim-data.json')
-          .pipe(
-              tap((response) => this.logger.debug(`Response status ${response.status} for VATSIM ATIS request`)),
-              tap((response) => this.logger.debug(`Response contains ${response.data.atis.length} entries`)),
-              map((response) => response.data.atis),
-          ).toPromise();
-
-      this.cache.set('/atis/blob/vatsim', data, 120).then();
-      return data;
-  }
-
   private handleVatsim(icao: string): Promise<Atis> {
-      return this.fetchVatsimBlob()
+      return this.vatsim.fetchVatsimData()
           .then((response) => ({
               icao,
               source: 'Vatsim',
-              combined: response
+              combined: response.atis
                   .find((x) => x.callsign === `${icao}_ATIS`)
                   .text_atis
                   .join(' ')
@@ -102,29 +82,8 @@ export class AtisService {
           });
   }
 
-  // IVAO
-  private async fetchIvaoBlob(): Promise<string[]> {
-      const cacheHit = await this.cache.get<string[]>('/atis/blob/ivao');
-
-      if (cacheHit) {
-          this.logger.debug('Returning from cache');
-          return cacheHit;
-      }
-      const data = await this.http.get<Buffer>('https://api.ivao.aero/getdata/whazzup/whazzup.txt', { responseType: 'arraybuffer' })
-          .pipe(
-              tap((response) => this.logger.debug(`Response status ${response.status} for IVAO ATIS request`)),
-              tap((response) => this.logger.debug(`Response contains ${response.data.length} entries`)),
-              map((response) => iconv
-                  .decode(response.data, 'ISO-8859-1')
-                  .split(/\r?\n/)),
-          ).toPromise();
-
-      this.cache.set('/atis/blob/ivao', data, 120).then();
-      return data;
-  }
-
   private handleIvao(icao: string): Promise<Atis> {
-      return this.fetchIvaoBlob()
+      return this.ivao.fetchIvaoData()
           .then((response) => ({
               icao,
               source: 'IVAO',
