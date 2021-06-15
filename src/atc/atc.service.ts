@@ -14,7 +14,7 @@ export class AtcService {
         const arr: ATCInfo[] = [];
         for (const c of data.controllers) {
             const atcType = this.callSignToAtcType(c.callsign);
-            if (atcType !== AtcType.unknow) {
+            if (atcType !== AtcType.UNKNOWN) {
                 const trans = transceivers.find((t) => t.callsign === c.callsign);
                 const position = this.getCenterOfCoordinates(trans?.transceivers);
                 const freqency = this.getFrequency(trans?.transceivers);
