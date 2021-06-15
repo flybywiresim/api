@@ -15,7 +15,7 @@ import { ATCInfo } from './atc-info.class';
 import { AtcService } from './atc.service';
 
 @ApiTags('ATC')
-@Controller('v1/atc')
+@Controller('api/v1/atc')
 @UseInterceptors(CacheInterceptor)
 export class AtcController {
     constructor(private atcService: AtcService) {}
