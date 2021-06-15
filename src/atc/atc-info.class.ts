@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum AtcType {
-  unknow,
-  delivery,
-  ground,
-  tower,
-  departure,
-  approach,
-  radar
+  UNKNOWN,
+  DELIVERY,
+  GROUND,
+  TOWER,
+  DEPARTURE,
+  APPROACH,
+  RADAR
 }
 
 export class ATCInfo {
