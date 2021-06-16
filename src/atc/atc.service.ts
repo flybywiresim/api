@@ -64,29 +64,32 @@ export class AtcService {
             }
         }
 
-        return arr.filter((c) => c.type !== AtcType.unknow);
+        return arr.filter((c) => c.type !== AtcType.UNKNOWN);
     }
 
     public callSignToAtcType(callsign: string): AtcType {
         if (callsign.indexOf('_CTR') > -1) {
-            return AtcType.radar;
+            return AtcType.RADAR;
         }
         if (callsign.indexOf('_DEL') > -1) {
-            return AtcType.delivery;
+            return AtcType.DELIVERY;
         }
         if (callsign.indexOf('_GND') > -1) {
-            return AtcType.ground;
+            return AtcType.GROUND;
         }
         if (callsign.indexOf('_DEP') > -1) {
-            return AtcType.departure;
+            return AtcType.DEPARTURE;
         }
         if (callsign.indexOf('_APP') > -1) {
-            return AtcType.approach;
+            return AtcType.APPROACH;
         }
         if (callsign.indexOf('_TWR') > -1) {
-            return AtcType.tower;
+            return AtcType.TOWER;
         }
-        return AtcType.unknow;
+        if (callsign.indexOf('_ATIS') > -1) {
+            return AtcType.ATIS;
+        }
+        return AtcType.UNKNOWN;
     }
 
     public getFrequency(array:any[]):string {
