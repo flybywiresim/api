@@ -29,7 +29,7 @@ export class AtcController {
         required: true,
         enum: ['vatsim', 'ivao'],
     })
-    @ApiOkResponse({ description: 'list of connected atc', type: ATCInfo })
+    @ApiOkResponse({ description: 'list of connected atc', type: [ATCInfo] })
     async getControllers(@Query('source') source?: string): Promise<ATCInfo[]> {
         if (source === 'vatsim') {
             return this.atcService.getVatsimControllers();
