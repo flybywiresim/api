@@ -12,7 +12,7 @@ export class AtcService {
         const transceivers = await this.vatsimService.fetchVatsimTransceivers();
 
         const arr: ATCInfo[] = [];
-        for (const c of data.controllers) {
+        for (const c of [...data.controllers, ...data.atis]) {
             const atcType = this.callSignToAtcType(c.callsign);
             if (atcType !== AtcType.UNKNOWN) {
                 const trans = transceivers.find((t) => t.callsign === c.callsign);
@@ -85,6 +85,9 @@ export class AtcService {
         }
         if (callsign.indexOf('_TWR') > -1) {
             return AtcType.TOWER;
+        }
+        if (callsign.indexOf('_ATIS') > -1) {
+            return AtcType.ATIS;
         }
         return AtcType.UNKNOWN;
     }
