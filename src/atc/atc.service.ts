@@ -17,7 +17,7 @@ export class AtcService {
             if (atcType !== AtcType.UNKNOWN) {
                 const trans = transceivers.find((t) => t.callsign === c.callsign);
                 const position = this.getCenterOfCoordinates(trans?.transceivers);
-                const freqency = this.getFrequency(trans?.transceivers);
+                const freqency = trans ? this.getFrequency(trans?.transceivers) : c.frequency;
 
                 if (freqency) {
                     arr.push({
@@ -33,6 +33,14 @@ export class AtcService {
             }
         }
 
+        // try to force ATIS location
+        for (const c of arr.filter((i) => i.type === AtcType.ATIS && (!i.latitude || !i.longitude))) {
+            const other = arr.find((o) => o.callsign.split('_')[0] === c.callsign.split('_')[0]);
+            if (other) {
+                c.latitude = other.latitude;
+                c.longitude = other.longitude;
+            }
+        }
         return arr;
     }
 
