@@ -21,10 +21,10 @@ export class PilotController {
     constructor(private pilotService: PilotService) {}
 
     @Get('')
-    @CacheTTL(120)
+    @CacheTTL(60)
     @ApiQuery({
         name: 'source',
-        description: 'The source for the atcs',
+        description: 'The source for the pilots',
         example: 'vatsim',
         required: true,
         enum: ['vatsim', 'ivao'],

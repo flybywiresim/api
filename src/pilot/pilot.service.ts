@@ -18,20 +18,38 @@ export class PilotService {
                 departure: p.flight_plan?.departure,
                 heading: p.heading,
                 altitude: p.altitude,
-                groundspeed : p.groundspeed,
-                name : p.name,
+                groundspeed: p.groundspeed,
+                name: p.name,
                 latitude: p.latitude,
-                longitude: p.longitude
-            });   
+                longitude: p.longitude,
+            });
         }
         return arr;
     }
 
     public async getIvaoPilots(): Promise<PilotInfo[]> {
-        return [];
+        const data = await this.ivaoService.fetchIvaoData();
+        const arr: PilotInfo[] = [];
+        for (const c of data) {
+            if (c.indexOf(':PILOT:') > -1) {
+                const split = c.split(':');
+                arr.push(
+                    {
+                        callsign: split[0],
+                        aircraft: split[9],
+                        arrival: split[13],
+                        departure: split[11],
+                        heading: parseInt(split[45]),
+                        altitude: parseInt(split[7]),
+                        groundspeed: parseInt(split[8]),
+                        name: '',
+                        latitude: parseFloat(split[5]),
+                        longitude: parseFloat(split[6]),
+                    },
+                );
+            }
+        }
+
+        return arr;
     }
-
-    
-   
-
 }
