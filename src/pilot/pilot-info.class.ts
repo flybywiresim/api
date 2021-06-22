@@ -13,13 +13,13 @@ export class PilotInfo {
   @ApiProperty({ description: 'The pilot longitude', example: -81.14929543157402 })
   longitude?: number;
 
-  @ApiProperty({description: 'The plane altitude', example: 15000 })
+  @ApiProperty({ description: 'The plane altitude', example: 15000 })
   altitude:number;
 
-  @ApiProperty({description: 'The plane heading', example: 247 })
+  @ApiProperty({ description: 'The plane heading', example: 247 })
   heading:number;
 
-  @ApiProperty({description: 'The plane ground speed', example: 250 })
+  @ApiProperty({ description: 'The plane ground speed', example: 250 })
   groundspeed:number;
 
   @ApiProperty({ description: 'the plane departure airport', example: 'EBBR' })
