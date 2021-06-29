@@ -1,10 +1,10 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { VatsimService } from 'src/utilities/vatsim.service';
-import { IvaoService } from 'src/utilities/ivao.service';
 import { Atis } from './atis.class';
 import { CacheService } from '../cache/cache.service';
+import { VatsimService } from '../utilities/vatsim.service';
+import { IvaoService } from '../utilities/ivao.service';
 
 @Injectable()
 export class AtisService {
@@ -13,7 +13,7 @@ export class AtisService {
   constructor(private http: HttpService,
               private readonly cache: CacheService,
               private readonly vatsim: VatsimService,
-                private readonly ivao : IvaoService) {
+              private readonly ivao : IvaoService) {
   }
 
   getForICAO(icao: string, source?: string): Promise<Atis> {

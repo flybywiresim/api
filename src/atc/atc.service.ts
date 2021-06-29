@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { IvaoService } from 'src/utilities/ivao.service';
-import { VatsimService } from 'src/utilities/vatsim.service';
 import { ATCInfo, AtcType } from './atc-info.class';
+import { VatsimService } from '../utilities/vatsim.service';
+import { IvaoService } from '../utilities/ivao.service';
 
 @Injectable()
 export class AtcService {
-    constructor(private readonly vatsimService: VatsimService, private readonly ivaoService: IvaoService) {}
+    constructor(private readonly vatsimService: VatsimService,
+                private readonly ivaoService: IvaoService) {}
 
     public async getVatsimControllers(): Promise<ATCInfo[]> {
         const data = await this.vatsimService.fetchVatsimData();
