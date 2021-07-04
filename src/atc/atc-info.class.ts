@@ -24,7 +24,7 @@ export class ATCInfo {
   @ApiProperty({ description: 'The atc current ATIS', example: ['line 1', 'line2', 'line3'] })
   textAtis: string[];
 
-  @ApiProperty({ description: 'The atc type', example: 'GND' })
+  @ApiProperty({ description: 'The atc type', example: 1 })
   type: AtcType;
 
   @ApiProperty({ description: 'The atc latitude', example: 32.08420727935125 })
