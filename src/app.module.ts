@@ -23,6 +23,7 @@ import { AtcController } from './atc/atc.controller';
 import { VatsimService } from './utilities/vatsim.service';
 import { AtcService } from './atc/atc.service';
 import { IvaoService } from './utilities/ivao.service';
+import { GnssModule } from './gnss/gnss.module';
 
 @Module({
     imports: [
@@ -111,6 +112,7 @@ import { IvaoService } from './utilities/ivao.service';
         AirportModule,
         GitVersionsModule,
         ChartsModule,
+        GnssModule,
     ],
     controllers: [
         AppController,
