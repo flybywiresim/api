@@ -30,6 +30,7 @@ export class GitVersionsService {
               tap((response) => this.logger.debug(`Response status ${response.status} for GitHub commit request`)),
               map((response) => ({
                   sha: response.data.sha,
+                  shortSha: response.data.sha.slice(0, 7),
                   timestamp: response.data.commit.committer.date,
               })),
               catchError(

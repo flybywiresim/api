@@ -25,6 +25,7 @@ export class GitVersionsController {
         } catch (e) {
             return {
                 sha: '',
+                shortSha: '',
                 timestamp: new Date(),
             };
         }
