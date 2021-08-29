@@ -24,6 +24,7 @@ import { VatsimService } from './utilities/vatsim.service';
 import { AtcService } from './atc/atc.service';
 import { IvaoService } from './utilities/ivao.service';
 import { GnssModule } from './gnss/gnss.module';
+import { WindsModule } from './winds/winds.module';
 
 @Module({
     imports: [
@@ -113,6 +114,7 @@ import { GnssModule } from './gnss/gnss.module';
         GitVersionsModule,
         ChartsModule,
         GnssModule,
+        WindsModule,
     ],
     controllers: [
         AppController,
