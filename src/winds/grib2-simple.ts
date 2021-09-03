@@ -263,20 +263,6 @@ export namespace Grib2sample {
           completeResult.push(result);
       }
 
-      // Wind = 0 0
-      // UGRD = 2 2
-      // VGRD = 2 3
-
-      console.log(completeResult[0].sections.section1.data); // Details of when the forecast was made.
-      console.log(completeResult[0].sections.section5.data);  // Value
-      console.log(completeResult[0].sections.section4.data);
-      // console.log(completeResult[0].sections.section3.data); // Contains Lat/Lon data : Note -3 = 357 i.e. 360-x rather than -x
-      console.log(completeResult[1].sections.section5.data);  // Value
-      console.log(completeResult[1].sections.section4.data);
-
-      console.log(completeResult[2].sections.section5.data);  // Value
-      console.log(completeResult[2].sections.section4.data);
-
       return completeResult;
   };
 
