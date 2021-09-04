@@ -17,6 +17,7 @@ export class TelexConnection {
   isActive?: boolean;
 
   @CreateDateColumn()
+  @Index()
   @ApiProperty({ description: 'The time of first contact' })
   firstContact?: Date;
 
