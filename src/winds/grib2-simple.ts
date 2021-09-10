@@ -133,6 +133,9 @@ export namespace Grib2sample {
           timeUnitRange: sectionBuffer[17],
           forecastTime: sectionBuffer.readUInt32BE(18),
           forecastTimestap: referenceTimestamp + factor * sectionBuffer.readUInt32BE(18),
+          firstfixedSurfaceType: sectionBuffer[22],
+          firstfixedScaleFactor: sectionBuffer.readUInt16BE(23),
+          firstfixedValue: sectionBuffer.readInt32BE(24),
       };
 
       const { timeUnitRange } = result;
@@ -175,8 +178,10 @@ export namespace Grib2sample {
 
   const parseDataRepresentationTemplate5 = (sectionBuffer) => {
       const R = sectionBuffer.readFloatBE(11);
-      let E = sectionBuffer.readUInt16BE(15) && 0x7fff;
-      let D = sectionBuffer.readUInt16BE(17) && 0x7fff;
+      // eslint-disable-next-line no-bitwise
+      let E = sectionBuffer.readUInt16BE(15) & 0x7fff;
+      // eslint-disable-next-line no-bitwise
+      let D = sectionBuffer.readUInt16BE(17) & 0x7fff;
 
       // eslint-disable-next-line no-bitwise
       if ((sectionBuffer.readUInt16BE(15) >> 15) > 0) {
@@ -197,7 +202,7 @@ export namespace Grib2sample {
       };
   };
 
-  const parseSection6 = (buffer, startIndex) =>  {
+  const parseSection6 = (buffer, startIndex) => {
       const result = {
           length: buffer.readUInt32BE(startIndex),
           numberOfSection: buffer[startIndex + 4],
@@ -217,6 +222,7 @@ export namespace Grib2sample {
           length: buffer.readUInt32BE(startIndex),
           numberOfSection: buffer[startIndex + 4],
           rawData: buffer.slice(startIndex + 5, startIndex + buffer.readUInt32BE(startIndex)),
+          // rawData: buffer.slice(startIndex + 5),
       };
 
       return {
