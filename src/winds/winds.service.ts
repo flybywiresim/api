@@ -1,17 +1,30 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
-import { createWriteStream } from 'fs';
 import { tmpdir } from 'os';
-import { join, resolve } from 'path';
-import { exit } from 'process';
+import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
-import { Grib2sample } from './grib2-simple';
+import { GRIB, GRIBPacket } from 'vgrib2';
 
 const fs = require('fs-extra');
 const moment = require('moment-timezone');
+
 const finished = promisify(stream.finished);
 
+type gribArray = {
+    lat: number,
+    lon: number,
+    value: number,
+}
+
+type processGribType = {
+    forecastTime: Date,
+    mb: number,
+    altitude: number,
+    data: Array<gribArray>,
+    valueType: string,
+    valueUnit: string,
+  }
 
 @Injectable()
 export class WindsService {
@@ -67,70 +80,20 @@ export class WindsService {
       return (1013.25 * two);
   }
 
-  hex2bin(hex) {
-      return (parseInt(hex, 16).toString(2));
-  }
-
-  whatValue(row, c1, c2) {
-      const bitLength = row.sections.section5.data.dataRepresentationTemplate.numberOfBitsForPacking;
-      // const bitLength = 8;
-      // console.log(row.sections.section7);
-      // console.log(row.sections.section7.data.rawData);
-      console.log("Section 5");
-      console.log(row.sections.section5.data.dataRepresentationTemplate.R / c2);
-      const string = this.hex2bin(row.sections.section7.data.rawData.toString('hex'));
-      console.log(string);
-      const splitBitsArray = string.match(new RegExp(`.{1,${bitLength}}`, 'g'));
-      console.log('Split bits');
-      console.log(splitBitsArray);
-      const finalValue = splitBitsArray.map((x) => {
-          if (x.length === bitLength) {
-              const val = parseInt(x, 2);
-              return (row.sections.section5.data.dataRepresentationTemplate.R + (val * c1)) / c2;
-          }
-          return null;
-      });
-      return finalValue;
-  }
-
-  processGribRows(row: any) {
-      // console.log("--------------- Processing row ------------------");
-      // console.log("-------------------------------------------------");
-      // eslint-disable-next-line no-nested-ternary
-      const variable = row.sections.section4.data.productDefinitionTemplate.parameterCategory === 0 ? 'TEMP'
-          : (row.sections.section4.data.productDefinitionTemplate.parameterNumber === 2 ? 'UGRD'
-              : 'VGRD');
-
-      // console.log('Section 5');
-      // console.log(row.sections.section5);
-      const c1 = 2 ** row.sections.section5.data.dataRepresentationTemplate.E;
-      const c2 = 10 ** row.sections.section5.data.dataRepresentationTemplate.D;
-
-      // http://meteo.ieec.uned.es:8086/PFC_JMEstepa/documentos/GRIB.pdf
-
-      const value = this.whatValue(row, c1, c2).filter(Number);
-      // Looks like if there are only 3 elements in array, the lowest value is actually the first
-      if (value.length === 3) {
-          value.unshift(((row.sections.section5.data.dataRepresentationTemplate.R * c1) / c2));
-      }
-
-      const s4Template = row.sections.section4.data.productDefinitionTemplate;
-      // Set default altitude of 100000 for tropopause
-      const altitude = s4Template.firstfixedSurfaceType === 7 ? 100000 : s4Template.firstfixedValue / (10 ** s4Template.firstfixedScaleFactor) / 100;
-
+  processGribRows(row: GRIBPacket) {
       const result = {
-          timestamp: row.sections.section1.data.referenceTimestamp,
-          year: row.sections.section1.data.year,
-          month: row.sections.section1.data.month,
-          day: row.sections.section1.data.day,
-          hour: row.sections.section1.data.hour,
-          forecast: row.sections.section4.data.productDefinitionTemplate.forecastTime,
-          mb: altitude,
-          altitude: altitude === 100000 ? altitude : Math.round((145366.45 * (1 - ((altitude / 1013.25) ** 0.190284)))),
-          variable,
-          value,
+          forecastTime: row.productDefinition.forecastTime,
+          mb: row.productDefinition.surface1.value / 100,
+          altitude: Math.round((145366.45 * (1 - (((row.productDefinition.surface1.value / 100) / 1013.25) ** 0.190284)))),
+          data: [
+              { lat: row.gridDefinition.la1, lon: row.gridDefinition.lo1 > 180 ? row.gridDefinition.lo1 - 360 : row.gridDefinition.lo1, value: row.data[0] },
+              { lat: row.gridDefinition.la1, lon: row.gridDefinition.lo2 > 180 ? row.gridDefinition.lo2 - 360 : row.gridDefinition.lo2, value: row.data[1] },
+              { lat: row.gridDefinition.la2, lon: row.gridDefinition.lo1 > 180 ? row.gridDefinition.lo1 - 360 : row.gridDefinition.lo1, value: row.data[2] },
+              { lat: row.gridDefinition.la2, lon: row.gridDefinition.lo2 > 180 ? row.gridDefinition.lo2 - 360 : row.gridDefinition.lo2, value: row.data[3] },
+          ],
+          valueType: row.productDefinition.paramater.abbrev,
+          valueUnit: row.productDefinition.paramater.units,
       };
-
       return result;
   }
 
@@ -141,12 +104,8 @@ export class WindsService {
       this.logger.debug(filePath);
       try {
           const fileContentBuffer = await fs.readFile(filePath);
-
-          const grib2Array = Grib2sample.parseCompleteGrib2Buffer(fileContentBuffer);
-          // Temp = 0 0
-          // UGRD = 2 2
-          // VGRD = 2 3
-          const windArray: any[] = grib2Array.map(this.processGribRows, this);
+          const grib = GRIB.parse(fileContentBuffer);
+          const windArray: Array<processGribType> = grib.map(this.processGribRows, this);
           console.log('Wind Array is:');
           console.log(windArray);
           return windArray;
@@ -185,9 +144,9 @@ export class WindsService {
   }
 
   async getSingleWind(altitude: number, lat: number, lon: number, datetime: string, forecast: number) {
-    //   const response = await this.getResponse(0, altitude, lat, lon, datetime, forecast).then(() => this.readGrib2File());
-    //   return response;
+      // const response = await this.getResponse(0, altitude, lat, lon, datetime, forecast).then(() => this.readGrib2File());
+      // return response;
 
-    this.readGrib2File();
+      this.readGrib2File();
   }
 }

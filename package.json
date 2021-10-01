@@ -57,6 +57,7 @@
     "rxjs": "^6.5.4",
     "swagger-ui-express": "^4.1.4",
     "typeorm": "^0.2.28",
+    "vgrib2": "^0.1.9",
     "winston": "^3.3.3"
   },
   "devDependencies": {
