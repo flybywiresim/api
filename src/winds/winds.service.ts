@@ -5,6 +5,7 @@ import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
 import { GRIB, GRIBPacket } from 'vgrib2';
+import { Wind } from './dto/wind.dto';
 
 const fs = require('fs-extra');
 const moment = require('moment-timezone');
@@ -34,7 +35,7 @@ export class WindsService {
       return 'This action returns all winds everywhere';
   }
 
-  minMaxLatLon(lat: number, lon:number) {
+  private minMaxLatLon(lat: number, lon:number) {
       return [
           Math.floor(lat),
           Math.ceil(lat),
@@ -43,11 +44,11 @@ export class WindsService {
       ];
   }
 
-  zeroPad(num, places) {
+  private zeroPad(num, places) {
       return String(num).padStart(places, '0');
   }
 
-  nearestSix(dt: string) {
+  private nearestSix(dt: string) {
       const date = dt.substring(0, 10).replace(/-/g, '');
       const hour = parseInt(dt.substring(11, 13));
       const nearestForecastHour = Math.floor(hour / 6) * 6;
@@ -58,7 +59,7 @@ export class WindsService {
       ];
   }
 
-  buildWindURLQuery(altitude: number, lat: number, lon: number, datetime: string, forecastHours: number) {
+  private buildWindURLQuery(altitude: number, lat: number, lon: number, datetime: string, forecastHours: number) {
       const fh = forecastHours % 3 === 0 && forecastHours > 0 && forecastHours <= 384 ? forecastHours : 0;
       const paddedForecastHours = this.zeroPad(fh, 3);
       const dateQuery = this.nearestSix(datetime);
@@ -73,29 +74,67 @@ export class WindsService {
       ];
   }
 
-  altitudeToMb(altitude: number) {
+  private altitudeToMb(altitude: number) {
       const one = 1 - (6.87535 * 10 ** -6 * altitude);
       const two = one ** 5.2561;
       return (1013.25 * two);
   }
 
-  processGribRows(row: GRIBPacket, altitude: number, lat: number, lon: number) {
+  private linearRegression = (y, x) => {
+      const n = y.length;
+      let sumX = 0;
+      let sumY = 0;
+      let sumXy = 0;
+      let sumXx = 0;
+
+      for (let i = 0; i < y.length; i++) {
+          sumX += x[i];
+          sumY += y[i];
+          sumXy += (x[i] * y[i]);
+          sumXx += (x[i] * x[i]);
+      }
+
+      const slope = (n * sumXy - sumX * sumY) / (n * sumXx - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+
+      return {
+          slope,
+          intercept,
+      };
+  }
+
+  private linearRegressionEstimate(point1: number, point2: number, value1: number, value2: number, finalPoint: number) {
+      // console.log(point1 + ' ' + point2 + ' ', value1 + ' ' + value2 + ' ' + finalPoint);
+      const lrCoefficients = this.linearRegression([value1, value2], [point1, point2]);
+      // console.log(lrCoefficients);
+      return ((lrCoefficients.slope * finalPoint) + lrCoefficients.intercept);
+  }
+
+  private processGribRows(row: GRIBPacket, altitude: number, lat: number, lon: number) {
       // Need to handle case where there is only 1 or 2 values returned because lat/lon is an integer
       // Need to set order for data values
       console.log('inside process Grib Rows');
-    // console.log(row);
+      // console.log(row);
       // Step 1 create data - iterate through to create a single temperature, UGHD and VGHD for the given lat and lon
       // Case 1: only one value which is easy, just return that
-      // Case 2: 2 values either lat1 and lat2 are the same, or lon1 and lon1 are the same. Either way, we can creat linear regression and 
+      // Case 2: 2 values either lat1 and lat2 are the same, or lon1 and lon1 are the same. Either way, we can creat linear regression and
       // calculate value for given lat and lo
       // Case 3: We have 4 or more values, in which case we need to do some complicated 4 way calculations...
       // Will still need to do another calculate to get the altitude as we'll have two sets of values for this.
-        console.log('Number of data points is ' + row.numberOfDataPoints);
+      console.log(`Number of data points is ${row.numberOfDataPoints}`);
       let value = 0;
       if (row.numberOfDataPoints === 1) {
           value = (row.dataRepresentation.referenceValue * (2 ** row.dataRepresentation.binaryScaleFactor)) / (10 ** row.dataRepresentation.decimalScaleFactor);
       } else if (row.numberOfDataPoints === 2) {
           // Linear regression
+          if (row.gridDefinition.la1 === row.gridDefinition.la2) {
+              // Latitudes are the same
+              value = this.linearRegressionEstimate(row.gridDefinition.lo1 > 180 ? row.gridDefinition.lo1 - 360 : row.gridDefinition.lo1,
+                  row.gridDefinition.lo2 > 180 ? row.gridDefinition.lo2 - 360 : row.gridDefinition.lo2, row.data[0], row.data[1], lon);
+          } else {
+              // Longitudes are the same
+              value = this.linearRegressionEstimate(row.gridDefinition.la1, row.gridDefinition.la2, row.data[0], row.data[1], lon);
+          }
       } else if (row.numberOfDataPoints >= 4) {
           // Quad equation thing
       } else {
@@ -115,7 +154,11 @@ export class WindsService {
       return result;
   }
 
-  async readGrib2File(altitude: number, lat: number, lon: number) {
+  private radiansToDegrees(radians: number) {
+      return radians * (180 / Math.PI);
+  }
+
+  private async readGrib2File(altitude: number, lat: number, lon: number): Promise<Wind | any> {
       const dir = tmpdir();
       const filePath = join(dir, 'winds.anl');
       // const filePath = join(dir, 'test.grib2');
@@ -126,16 +169,38 @@ export class WindsService {
           const grib = GRIB.parse(fileContentBuffer);
           // console.log(grib);
           const windArray: Array<processGribType> = grib.map((row) => this.processGribRows(row, altitude, lat, lon));
-          console.log(windArray);
-          console.log(JSON.stringify(windArray));
-          return windArray;
+
+          // Get TMP, UGRD and VGRD values for each altitude
+          const TmpObj = windArray.filter((f) => f.valueType === 'TMP');
+          const UgrdObj = windArray.filter((f) => f.valueType === 'UGRD');
+          const VgrdObj = windArray.filter((f) => f.valueType === 'VGRD');
+
+          console.log(`Altitude we want is ${altitude}`);
+          const temp = this.linearRegressionEstimate(TmpObj[0].altitude, TmpObj[1].altitude, TmpObj[0].value, TmpObj[1].value, altitude);
+          const ugrd = this.linearRegressionEstimate(UgrdObj[0].altitude, UgrdObj[1].altitude, UgrdObj[0].value, UgrdObj[1].value, altitude);
+          const vgrd = this.linearRegressionEstimate(VgrdObj[0].altitude, VgrdObj[1].altitude, VgrdObj[0].value, VgrdObj[1].value, altitude);
+
+          console.log(TmpObj);
+          console.log(`Temp is ${temp} and ugrd is ${ugrd} and vgrd is ${vgrd}`);
+          // console.log(JSON.stringify(windArray));
+          const result = {
+              forecastTime: windArray[0].forecastTime,
+              altitude,
+              lat,
+              lon,
+              temp,
+              windSpeed: Math.round((Math.sqrt(ugrd ** 2 + vgrd ** 2) / 0.514444) * 1.943844),
+              windDirection: Math.round((this.radiansToDegrees(Math.atan2(ugrd, vgrd)) + 180) % 360) - 180,
+          };
+          console.log(result);
+          return result;
       } catch (err) {
           this.logger.error(err);
           return [err];
       }
   }
 
-  async getResponse(count: number, altitude: number, lat: number, lon: number, datetime: string, forecast: number): Promise<any> {
+  private async getResponse(count: number, altitude: number, lat: number, lon: number, datetime: string, forecast: number): Promise<any> {
       const windUrl = this.buildWindURLQuery(altitude, lat, lon, datetime, forecast);
       console.log(windUrl);
       const dir = tmpdir();
@@ -164,12 +229,12 @@ export class WindsService {
       });
   }
 
-  async getSingleWind(altitude: number, lat: number, lon: number, datetime: string, forecast: number) {
+  async getSingleWind(altitude: number, lat: number, lon: number, datetime: string, forecast: number) : Promise<Wind | any> {
       // Do some validation here
-      
-        // const response = await this.getResponse(0, altitude, lat, lon, datetime, forecast).then(() => this.readGrib2File(altitude, lat, lon));
-        // return response;
 
-      this.readGrib2File(altitude, lat, lon);
+      const response = await this.getResponse(0, altitude, lat, lon, datetime, forecast).then(() => this.readGrib2File(altitude, lat, lon));
+      return response;
+
+      // return this.readGrib2File(altitude, lat, lon);
   }
 }

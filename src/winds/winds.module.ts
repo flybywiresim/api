@@ -3,7 +3,7 @@ import { WindsService } from './winds.service';
 import { WindsController } from './winds.controller';
 
 @Module({
-  controllers: [WindsController],
-  providers: [WindsService]
+    controllers: [WindsController],
+    providers: [WindsService],
 })
 export class WindsModule {}
