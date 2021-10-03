@@ -103,18 +103,26 @@ export class WindsService {
       };
   }
 
-  private linearRegressionEstimate(point1: number, point2: number, value1: number, value2: number, finalPoint: number) {
+  private linearRegressionEstimate(point1: number, point2: number, value1: number, value2: number, finalPoint: number): number {
       // console.log(point1 + ' ' + point2 + ' ', value1 + ' ' + value2 + ' ' + finalPoint);
       const lrCoefficients = this.linearRegression([value1, value2], [point1, point2]);
       // console.log(lrCoefficients);
       return ((lrCoefficients.slope * finalPoint) + lrCoefficients.intercept);
   }
 
+  private bilinearInterpretation(values: number[], x1: number, x2: number, y1: number, y2: number, x: number, y: number) : number {
+      const q11 = (((x2 - x) * (y2 - y)) / ((x2 - x1) * (y2 - y1))) * values[0];
+      const q21 = (((x - x1) * (y2 - y)) / ((x2 - x1) * (y2 - y1))) * values[2];
+      const q12 = (((x2 - x) * (y - y1)) / ((x2 - x1) * (y2 - y1))) * values[1];
+      const q22 = (((x - x1) * (y - y1)) / ((x2 - x1) * (y2 - y1))) * values[3];
+      return q11 + q21 + q12 + q22;
+  }
+
   private processGribRows(row: GRIBPacket, altitude: number, lat: number, lon: number) {
       // Need to handle case where there is only 1 or 2 values returned because lat/lon is an integer
       // Need to set order for data values
       console.log('inside process Grib Rows');
-      // console.log(row);
+      console.log(row);
       // Step 1 create data - iterate through to create a single temperature, UGHD and VGHD for the given lat and lon
       // Case 1: only one value which is easy, just return that
       // Case 2: 2 values either lat1 and lat2 are the same, or lon1 and lon1 are the same. Either way, we can creat linear regression and
@@ -137,6 +145,9 @@ export class WindsService {
           }
       } else if (row.numberOfDataPoints >= 4) {
           // Quad equation thing
+          value = this.bilinearInterpretation(row.data, row.gridDefinition.la1, row.gridDefinition.la2,
+              row.gridDefinition.lo1 > 180 ? row.gridDefinition.lo1 - 360 : row.gridDefinition.lo1,
+              row.gridDefinition.lo2 > 180 ? row.gridDefinition.lo2 - 360 : row.gridDefinition.lo2, lat, lon);
       } else {
           console.log('Error');
       }
@@ -151,12 +162,10 @@ export class WindsService {
           valueType: row.productDefinition.paramater.abbrev,
           valueUnit: row.productDefinition.paramater.units,
       };
+      console.log(result);
       return result;
   }
 
-  private radiansToDegrees(radians: number) {
-      return radians * (180 / Math.PI);
-  }
 
   private async readGrib2File(altitude: number, lat: number, lon: number): Promise<Wind | any> {
       const dir = tmpdir();
@@ -175,22 +184,18 @@ export class WindsService {
           const UgrdObj = windArray.filter((f) => f.valueType === 'UGRD');
           const VgrdObj = windArray.filter((f) => f.valueType === 'VGRD');
 
-          console.log(`Altitude we want is ${altitude}`);
           const temp = this.linearRegressionEstimate(TmpObj[0].altitude, TmpObj[1].altitude, TmpObj[0].value, TmpObj[1].value, altitude);
           const ugrd = this.linearRegressionEstimate(UgrdObj[0].altitude, UgrdObj[1].altitude, UgrdObj[0].value, UgrdObj[1].value, altitude);
           const vgrd = this.linearRegressionEstimate(VgrdObj[0].altitude, VgrdObj[1].altitude, VgrdObj[0].value, VgrdObj[1].value, altitude);
 
-          console.log(TmpObj);
-          console.log(`Temp is ${temp} and ugrd is ${ugrd} and vgrd is ${vgrd}`);
-          // console.log(JSON.stringify(windArray));
           const result = {
               forecastTime: windArray[0].forecastTime,
               altitude,
               lat,
               lon,
               temp,
-              windSpeed: Math.round((Math.sqrt(ugrd ** 2 + vgrd ** 2) / 0.514444) * 1.943844),
-              windDirection: Math.round((this.radiansToDegrees(Math.atan2(ugrd, vgrd)) + 180) % 360) - 180,
+              windSpeed: Math.round(Math.sqrt(ugrd ** 2 + vgrd ** 2) * 1.943844),
+              windDirection: (Math.round(180 + ((180 / Math.PI) * Math.atan2(vgrd, ugrd))) % 360) + 180,
           };
           console.log(result);
           return result;
