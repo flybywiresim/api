@@ -17,6 +17,7 @@ export const BannedFlightNumbers = [
     'SJY182',
 ];
 
-export const MessageFilters = [
+export const BlockedMessageFilters = [
     'LDS.ORG',
+    'LDSORG',
 ];
