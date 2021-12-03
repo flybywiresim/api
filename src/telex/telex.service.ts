@@ -8,7 +8,7 @@ import { TelexConnection } from './entities/telex-connection.entity';
 import { TelexMessage } from './entities/telex-message.entity';
 import { AuthService } from '../auth/auth.service';
 import { FlightToken } from '../auth/flights/flight-token.class';
-import { BannedFlightNumbers, MessageFilters } from './filters';
+import { BannedFlightNumbers, BlockedMessageFilters } from './filters';
 import { BoundsDto } from '../common/Bounds';
 import { PaginationDto } from '../common/Pagination';
 import { CreateTelexConnectionDto } from './dto/create-telex-connection.dto';
@@ -21,7 +21,7 @@ import { TelexMessageDto } from './dto/telex-message.dto';
 export class TelexService {
   private readonly logger = new Logger(TelexService.name);
 
-  private readonly messageFilter;
+  private readonly profanityFilter;
 
   constructor(
     private connection: Connection,
@@ -32,8 +32,7 @@ export class TelexService {
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
   ) {
-      this.messageFilter = new Filter();
-      this.messageFilter.addWords(...MessageFilters);
+      this.profanityFilter = new Filter();
   }
 
   @Cron('*/5 * * * * *')
@@ -188,6 +187,12 @@ export class TelexService {
           throw new HttpException(message, 404);
       }
 
+      // Check for blocked content. This implementation is somehow more resilient than `bad-words`
+      if (BlockedMessageFilters.some((str) => dto.message.toLowerCase().includes(str.toLowerCase()))) {
+          this.logger.warn(`Message with blocked content received: '${dto.message}' by ${sender.flight} (${sender.id})`);
+          throw new HttpException('Message with blocked content received', 400);
+      }
+
       const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true });
       if (!recipient || !recipient.freetextEnabled) {
           const message = `Active flight '${dto.to}' does not exist`;
@@ -199,7 +204,7 @@ export class TelexService {
           from: sender,
           to: recipient,
           message: dto.message,
-          isProfane: this.messageFilter.isProfane(dto.message),
+          isProfane: this.profanityFilter.isProfane(dto.message),
       };
 
       this.logger.log(`Sending a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
@@ -225,7 +230,7 @@ export class TelexService {
       }
 
       messages.forEach((msg) => {
-          msg.message = this.messageFilter.clean(msg.message);
+          msg.message = this.profanityFilter.clean(msg.message);
       });
 
       return messages;
