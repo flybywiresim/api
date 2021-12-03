@@ -18,4 +18,5 @@ export const BannedFlightNumbers = [
 ];
 
 export const MessageFilters = [
+    'LDS.ORG',
 ];
