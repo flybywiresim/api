@@ -20,4 +20,6 @@ export const BannedFlightNumbers = [
 export const BlockedMessageFilters = [
     'LDS.ORG',
     'LDSORG',
+    'COMEUNTOCHRIST',
+    'COME UNTO CHRIST',
 ];
