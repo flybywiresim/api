@@ -6,9 +6,14 @@ import { TelexConnectionController } from './telex-connection.controller';
 import { TelexMessage } from './entities/telex-message.entity';
 import { TelexMessageController } from './telex-message.controller';
 import { AuthModule } from '../auth/auth.module';
+import { DiscordModule } from '../discord/discord.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([TelexConnection, TelexMessage]), AuthModule],
+    imports: [
+        TypeOrmModule.forFeature([TelexConnection, TelexMessage]),
+        AuthModule,
+        DiscordModule,
+    ],
     providers: [TelexService],
     controllers: [TelexConnectionController, TelexMessageController],
     exports: [TelexService],

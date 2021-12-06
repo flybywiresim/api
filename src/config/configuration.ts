@@ -24,6 +24,7 @@ export default () => ({
     telex: {
         disableCleanup: envBool('TELEX_DISABLE_CLEANUP', true),
         timeoutMin: parseInt(process.env.TELEX_TIMEOUT_MIN) || 6,
+        discordWebhook: process.env.TELEX_DISCORD_WEBHOOK || '',
     },
     auth: {
         secret: envOrFile('AUTH_SECRET', './secrets/jwt_secret.txt') || 'FlyByWire',

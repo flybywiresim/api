@@ -16,6 +16,7 @@ import { UpdateTelexConnectionDto } from './dto/update-telex-connection.dto';
 import { PaginatedTelexConnectionDto } from './dto/paginated-telex-connection.dto';
 import { TelexSearchResult } from './dto/telex-search-result.dto';
 import { TelexMessageDto } from './dto/telex-message.dto';
+import { DiscordService } from '../discord/discord.service';
 
 @Injectable()
 export class TelexService {
@@ -31,6 +32,7 @@ export class TelexService {
     private readonly messageRepository: Repository<TelexMessage>,
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
+    private readonly discordService: DiscordService,
   ) {
       this.profanityFilter = new Filter();
   }
@@ -187,12 +189,6 @@ export class TelexService {
           throw new HttpException(message, 404);
       }
 
-      // Check for blocked content. This implementation is somehow more resilient than `bad-words`
-      if (BlockedMessageFilters.some((str) => dto.message.toLowerCase().includes(str.toLowerCase()))) {
-          this.logger.warn(`Message with blocked content received: '${dto.message}' by ${sender.flight} (${sender.id})`);
-          throw new HttpException('Message with blocked content received', 400);
-      }
-
       const recipient = await this.connectionRepository.findOne({ flight: dto.to, isActive: true });
       if (!recipient || !recipient.freetextEnabled) {
           const message = `Active flight '${dto.to}' does not exist`;
@@ -206,6 +202,17 @@ export class TelexService {
           message: dto.message,
           isProfane: this.profanityFilter.isProfane(dto.message),
       };
+
+      // Check for blocked content. This implementation is somehow more resilient than `bad-words`
+      const isBlocked = BlockedMessageFilters.some((str) => dto.message.toLowerCase().includes(str.toLowerCase()));
+
+      // No need to await this
+      this.discordService.publishTelexMessage(message, isBlocked).then().catch(this.logger.error);
+
+      if (isBlocked) {
+          this.logger.warn(`Message with blocked content received: '${dto.message}' by ${sender.flight} (${sender.id})`);
+          throw new HttpException('Message with blocked content received', 400);
+      }
 
       this.logger.log(`Sending a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
       return this.messageRepository.save(message);

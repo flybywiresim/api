@@ -74,6 +74,8 @@ spec:
               value: {{ .Values.api.telex.timeoutMin | quote }}
             - name: TELEX_DISABLE_CLEANUP
               value: {{ .Values.api.telex.disableCleanup | quote }}
+            - name: TELEX_DISCORD_WEBHOOK
+              value: {{ .Values.api.telex.discordWebhook }}
 
             # AUTH
             - name: AUTH_SECRET
