@@ -211,11 +211,17 @@ export class TelexService {
 
       if (isBlocked) {
           this.logger.warn(`Message with blocked content received: '${dto.message}' by ${sender.flight} (${sender.id})`);
-          throw new HttpException('Message with blocked content received', 400);
+
+          // Shadow blocking
+          message.received = true;
       }
 
       this.logger.log(`Sending a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
-      return this.messageRepository.save(message);
+      const storedMessage = await this.messageRepository.save(message);
+
+      // Shadow blocking
+      storedMessage.received = false;
+      return storedMessage;
   }
 
   async fetchMyMessages(connectionId: string,
