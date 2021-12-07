@@ -22,4 +22,6 @@ export const BlockedMessageFilters = [
     'LDSORG',
     'COMEUNTOCHRIST',
     'COME UNTO CHRIST',
+    'BOOKOFMORMON',
+    'BOOK OF MORMON',
 ];
