@@ -24,4 +24,9 @@ export const BlockedMessageFilters = [
     'COME UNTO CHRIST',
     'BOOKOFMORMON',
     'BOOK OF MORMON',
+
+    // Tiny URLs
+    'RB.GY',
+    'CUTT.LY',
+    'BIT.LY',
 ];
