@@ -18,12 +18,14 @@ export const BannedFlightNumbers = [
 ];
 
 export const BlockedMessageFilters = [
+    // Frequent spam
     'LDS.ORG',
     'LDSORG',
     'COMEUNTOCHRIST',
     'COME UNTO CHRIST',
     'BOOKOFMORMON',
     'BOOK OF MORMON',
+    'CHURCHOFJESUSCHRIST',
 
     // Tiny URLs
     'RB.GY',
