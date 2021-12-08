@@ -6,7 +6,9 @@ export const BannedFlightNumbers = [
 
     'AAL11',
     'AAL77',
+    'MAS17',
     'MH17',
+    'MAS370',
     'MH370',
     'UA93',
     'UA175',
