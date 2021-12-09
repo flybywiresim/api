@@ -205,11 +205,13 @@ export class TelexService {
 
       // Check for blocked content. This implementation is somehow more resilient than `bad-words`
       const isBlocked = BlockedMessageFilters.some((str) => dto.message.toLowerCase().includes(str.toLowerCase()));
+      // Check if message is being sent to oneself. If it is, disable shadow blocking so people don't try to reverse engineer the filter.
+      const sendingToSelf = sender.flight === dto.to;
 
       // No need to await this
       this.discordService.publishTelexMessage(message, isBlocked).then().catch(this.logger.error);
 
-      if (isBlocked) {
+      if (isBlocked && !sendingToSelf) {
           this.logger.warn(`Message with blocked content received: '${dto.message}' by ${sender.flight} (${sender.id})`);
 
           // Shadow blocking
