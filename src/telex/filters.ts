@@ -51,6 +51,10 @@ export const BlockedMessageFilters = [
     '.ORG',
     '.NET',
     '.IO',
+    '. COM',
+    '. ORG',
+    '. NET',
+    '. IO',
     // Tiny URLs
     'RB.GY',
     'CUTT.LY',
