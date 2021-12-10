@@ -10,6 +10,7 @@ import { TelexService } from './telex.service';
 import { TelexMessage } from './entities/telex-message.entity';
 import { FlightAuthGuard } from '../auth/flights/flight-auth-guard.service';
 import { TelexMessageDto } from './dto/telex-message.dto';
+import { IpAddress } from '../utilities/ip-address.decorator';
 
 @ApiTags('TELEX')
 @Controller('txmsg')
@@ -23,8 +24,8 @@ export class TelexMessageController {
   @ApiBody({ description: 'The message to send', type: TelexMessageDto })
   @ApiCreatedResponse({ description: 'The message could be addressed', type: TelexMessage })
   @ApiNotFoundResponse({ description: 'The sender or recipient flight number could not be found' })
-    async sendNewMessage(@Body() body: TelexMessageDto, @Request() req): Promise<TelexMessage> {
-        return this.telex.sendMessage(body, req.user.connectionId);
+    async sendNewMessage(@Body() body: TelexMessageDto, @Request() req, @IpAddress() userIp): Promise<TelexMessage> {
+        return this.telex.sendMessage(body, req.user.connectionId, userIp);
     }
 
   @Get()

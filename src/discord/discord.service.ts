@@ -15,7 +15,7 @@ export class DiscordService {
     ) {
     }
 
-    public async publishTelexMessage(telexMessage: TelexMessage, blocked: boolean): Promise<any> {
+    public async publishTelexMessage(telexMessage: TelexMessage, blocked: boolean, ipBlocked: boolean): Promise<any> {
         if (!this.webhookUrl) {
             this.logger.debug('Discord Webhook URL not configured -> skipping');
             return;
@@ -23,7 +23,7 @@ export class DiscordService {
 
         let color = 6280776; // #5fd648
         color = telexMessage.isProfane ? 14671680 : color; // #dfdf40
-        color = blocked ? 14299698 : color; // #da3232
+        color = (blocked || ipBlocked) ? 14299698 : color; // #da3232
 
         const discordMessage = {
             embeds: [{
@@ -47,8 +47,13 @@ export class DiscordService {
                         inline: true,
                     },
                     {
-                        name: 'Blocked',
+                        name: 'Content Blocked',
                         value: `\`${blocked ? 'true' : 'false'}\``,
+                        inline: true,
+                    },
+                    {
+                        name: 'IP Blocked',
+                        value: `\`${ipBlocked ? 'true' : 'false'}\``,
                         inline: true,
                     },
                 ],

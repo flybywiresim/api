@@ -7,10 +7,11 @@ import { TelexMessage } from './entities/telex-message.entity';
 import { TelexMessageController } from './telex-message.controller';
 import { AuthModule } from '../auth/auth.module';
 import { DiscordModule } from '../discord/discord.module';
+import { BlockedIp } from './entities/blocked-ip.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([TelexConnection, TelexMessage]),
+        TypeOrmModule.forFeature([TelexConnection, TelexMessage, BlockedIp]),
         AuthModule,
         DiscordModule,
     ],

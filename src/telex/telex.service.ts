@@ -17,6 +17,7 @@ import { PaginatedTelexConnectionDto } from './dto/paginated-telex-connection.dt
 import { TelexSearchResult } from './dto/telex-search-result.dto';
 import { TelexMessageDto } from './dto/telex-message.dto';
 import { DiscordService } from '../discord/discord.service';
+import { BlockedIp } from './entities/blocked-ip.entity';
 
 @Injectable()
 export class TelexService {
@@ -30,6 +31,8 @@ export class TelexService {
     private readonly connectionRepository: Repository<TelexConnection>,
     @InjectRepository(TelexMessage)
     private readonly messageRepository: Repository<TelexMessage>,
+    @InjectRepository(BlockedIp)
+    private readonly blockedIpRepository: Repository<BlockedIp>,
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
     private readonly discordService: DiscordService,
@@ -179,7 +182,7 @@ export class TelexService {
 
   // ======= Message Handling ======= //
 
-  async sendMessage(dto: TelexMessageDto, fromConnectionId: string): Promise<TelexMessage> {
+  async sendMessage(dto: TelexMessageDto, fromConnectionId: string, userIp: string): Promise<TelexMessage> {
       this.logger.log(`Trying to send a message from flight with ID '${fromConnectionId}' to flight with number ${dto.to}`);
 
       const sender = await this.getSingleConnection(fromConnectionId, true);
@@ -204,16 +207,24 @@ export class TelexService {
       };
 
       // Check for blocked content. This implementation is somehow more resilient than `bad-words`
-      const isBlocked = BlockedMessageFilters.some((str) => dto.message.toLowerCase().includes(str.toLowerCase()));
+      const blockedContent = BlockedMessageFilters.some((str) => dto.message.toLowerCase().includes(str.toLowerCase()));
+      // Check for an existing IP ban
+      const blockedIp = await this.blockedIpRepository.findOne({ ip: userIp, isActive: true });
       // Check if message is being sent to oneself. If it is, disable shadow blocking so people don't try to reverse engineer the filter.
       const sendingToSelf = sender.flight === dto.to;
 
       // No need to await this
-      this.discordService.publishTelexMessage(message, isBlocked).then().catch(this.logger.error);
+      this.discordService.publishTelexMessage(message, blockedContent, !!blockedIp).then().catch(this.logger.error);
 
-      if (isBlocked && !sendingToSelf) {
+      if (blockedContent) {
           this.logger.warn(`Message with blocked content received: '${dto.message}' by ${sender.flight} (${sender.id})`);
+      }
 
+      if (blockedIp) {
+          this.logger.warn(`Message from blocked IP '${blockedIp.ip}' received: '${dto.message}' by ${sender.flight} (${sender.id})`);
+      }
+
+      if ((blockedContent || blockedIp) && !sendingToSelf) {
           // Shadow blocking
           message.received = true;
       }
