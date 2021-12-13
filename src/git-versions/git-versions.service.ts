@@ -54,6 +54,7 @@ export class GitVersionsService {
                   response.data.filter((rel) => includePreReleases || !rel.prerelease).forEach((rel) => {
                       releases.push({
                           name: rel.name,
+                          isPreRelease: rel.prerelease,
                           htmlUrl: rel.html_url,
                           publishedAt: rel.published_at,
                           body: rel.body,
