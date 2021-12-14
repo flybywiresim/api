@@ -1,10 +1,11 @@
-import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL, Controller, Get, Param, Query, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GitVersionsService } from './git-versions.service';
 import { ReleaseInfo } from './dto/release-info.dto';
 import { PullInfo } from './dto/pull-info.dto';
 import { CommitInfo } from './dto/commit-info.dto';
 import { ArtifactInfo } from './dto/artifact-info.dto';
+import { PaginationDto } from '../common/Pagination';
 
 @ApiTags('Git Versions')
 @Controller('api/v1/git-versions')
@@ -36,20 +37,35 @@ export class GitVersionsController {
   @ApiParam({ name: 'user', description: 'The owner of the repository', example: 'flybywiresim' })
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
   @ApiQuery({
+      name: 'take',
+      type: Number,
+      required: false,
+      description: 'The number of releases to take',
+      schema: { maximum: 25, minimum: 0, default: 25 },
+  })
+  @ApiQuery({
+      name: 'skip',
+      type: Number,
+      required: false,
+      description: 'The number of releases to skip',
+      schema: { minimum: 0, default: 0 },
+  })
+  @ApiQuery({
       name: 'includePreReleases',
       description: 'Whether to include pre-releases in the list',
       required: false,
       enum: ['true', 'false'],
       schema: { default: false },
   })
-  @ApiOkResponse({ description: 'The newest commit on the branch', type: [ReleaseInfo] })
+  @ApiOkResponse({ description: 'The paginated releases', type: [ReleaseInfo] })
   async getReleases(
     @Param('user') user: string,
     @Param('repo') repo: string,
     @Query('includePreReleases') includePre: string,
+    @Query(new ValidationPipe({ transform: true })) pagination: PaginationDto,
   ): Promise<ReleaseInfo[]> {
       try {
-          return await this.service.getReleases(user, repo, includePre === undefined ? false : includePre === 'true').toPromise();
+          return await this.service.getReleases(user, repo, includePre === undefined ? false : includePre === 'true', pagination).toPromise();
       } catch (e) {
           return [];
       }
@@ -59,7 +75,7 @@ export class GitVersionsController {
   @CacheTTL(60)
   @ApiParam({ name: 'user', description: 'The owner of the repository', example: 'flybywiresim' })
   @ApiParam({ name: 'repo', description: 'The repository', example: 'a32nx' })
-  @ApiOkResponse({ description: 'The newest commit on the branch', type: [PullInfo] })
+  @ApiOkResponse({ description: 'The newest PRs of the repo', type: [PullInfo] })
   async getPulls(@Param('user') user: string, @Param('repo') repo: string): Promise<PullInfo[]> {
       try {
           return await this.service.getPulls(user, repo).toPromise();
