@@ -17,12 +17,9 @@ export class CpdlcService {
   }
 
   async getData(dto: CpdlcMessageDto): Promise<Cpdlc> {
-      this.logger.debug(`Requesting ${dto.type} for ${dto.from}`);
-
       const packet = `${dto.packet !== undefined ? `&packet=${encodeURIComponent(dto.packet)}`: ''}`;
       return this.http.get<string>(`http://www.hoppie.nl/acars/system/connect.html?logon=${dto.logon}&from=${dto.from}&to=${dto.to}&type=${dto.type}${packet}`)
           .pipe(
-              tap((response) => this.logger.debug(`Response status ${response.status} for Hoppie request request`)),
               map((response) => {
                   if (!response.data) {
                       throw this.generateNotAvailableException('Empty response');
