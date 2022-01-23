@@ -28,7 +28,7 @@ export class CpdlcService {
                       throw this.generateNotAvailableException('Empty response');
                   }
 
-                  return { logon: dto.logon, response: response.data };
+                  return { response: response.data };
               }),
               catchError(
                   (err) => {
