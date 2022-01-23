@@ -24,6 +24,8 @@ import { VatsimService } from './utilities/vatsim.service';
 import { AtcService } from './atc/atc.service';
 import { IvaoService } from './utilities/ivao.service';
 import { GnssModule } from './gnss/gnss.module';
+import { CpdlcController } from './cpdlc/cpdlc.controller';
+import { CpdlcService } from './cpdlc/cpdlc.service';
 
 @Module({
     imports: [
@@ -120,8 +122,9 @@ import { GnssModule } from './gnss/gnss.module';
         AtisController,
         TafController,
         AtcController,
+        CpdlcController,
     ],
-    providers: [MetarService, AtisService, TafService, VatsimService, IvaoService, AtcService],
+    providers: [MetarService, AtisService, TafService, VatsimService, IvaoService, AtcService, CpdlcService],
 })
 export class AppModule {
 }
