@@ -15,10 +15,10 @@ export class CpdlcController {
     constructor(private cpdlc: CpdlcService) {
     }
 
-  @Post()
-  @ApiBody({ description: 'The message to send', type: CpdlcMessageDto })
-  @ApiCreatedResponse({ description: 'The message could be addressed', type: Cpdlc })
-  @ApiNotFoundResponse({ description: 'The sender or recipient flight number could not be found' })
+    @Post()
+    @ApiBody({ description: 'The message to send', type: CpdlcMessageDto })
+    @ApiCreatedResponse({ description: 'The message could be addressed', type: Cpdlc })
+    @ApiNotFoundResponse({ description: 'The sender or recipient flight number could not be found' })
     async requestData(@Body() body: CpdlcMessageDto): Promise<Cpdlc> {
         return this.cpdlc.getData(body);
     }
