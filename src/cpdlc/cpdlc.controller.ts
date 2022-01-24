@@ -9,8 +9,8 @@ import { CpdlcService } from './cpdlc.service';
 import { CpdlcMessageDto } from './dto/cpdlc-message.dto';
 import { Cpdlc } from './cpdlc.class';
 
-@ApiTags('CPDLC')
-@Controller('cpdlc')
+@ApiTags('HOPPIE')
+@Controller('hoppie')
 export class CpdlcController {
     constructor(private cpdlc: CpdlcService) {
     }
