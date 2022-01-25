@@ -20,5 +20,5 @@ export class CpdlcMessageDto {
 
     @IsOptional()
     @ApiProperty({ description: 'The message content', example: 'data2//1/Hello' })
-    packet: string;
+    packet?: string;
 }
