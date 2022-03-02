@@ -26,8 +26,6 @@ export class MetarService {
           return this.handleVatsim(icaoCode).toPromise();
       case 'ms':
           return this.handleMs(icaoCode);
-      case 'ivao':
-          return this.handleIvao(icaoCode);
       case 'pilotedge':
           return this.handlePilotEdge(icaoCode).toPromise();
       }
