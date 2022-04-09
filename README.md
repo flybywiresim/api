@@ -1,4 +1,5 @@
-# <img src="https://raw.githubusercontent.com/flybywiresim/fbw-branding/master/svg/FBW-Logo.svg" placeholder="FlyByWire" width="400"/>
+![FlyByWire Simulations](https://raw.githubusercontent.com/flybywiresim/branding/1391fc003d8b5d439d01ad86e2778ae0bfc8b682/tails-with-text/FBW-Color-Light.svg)
+
 ## FlyByWire Simulations API
 
 This repo contains the source code to our API which is used in all our products from the A32NX mod all the way to the website. The documentation can be found at https://api.flybywiresim.com/api.
