@@ -23,7 +23,7 @@ export class IvaoService {
           this.logger.debug('Returning from cache');
           return cacheHit;
       }
-      const data = await this.http.get<Buffer>('https://api.ivao.aero/getdata/whazzup/whazzup.txt', { responseType: 'arraybuffer' })
+      const data = await this.http.get<Buffer>('https://api.ivao.aero/v2/tracker/whazzup', { responseType: 'arraybuffer' })
           .pipe(
               tap((response) => this.logger.debug(`Response status ${response.status} for IVAO  request`)),
               tap((response) => this.logger.debug(`Response contains ${response.data.length} entries`)),
