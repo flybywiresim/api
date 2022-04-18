@@ -90,7 +90,7 @@ export class IvaoService {
     constructor(
         private http: HttpService,
         private readonly cache: CacheService,
-    ) { }
+    ) {}
 
     public async fetchIvaoData(): Promise<AtisMergedWhazzup> {
         const cacheHit = await this.cache.get<AtisMergedWhazzup>('/ivao/data');
