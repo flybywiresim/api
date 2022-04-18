@@ -55,7 +55,8 @@ export class AtcService {
             latitude: atc.lastTrack.latitude,
             longitude: atc.lastTrack.longitude,
             type: this.callSignToAtcType(atc.callsign),
-            visualRange: 4,
+            // TODO FIXME: visual range is not currently available in the new IVAO Whazzup v2 data
+            visualRange: 100,
         }));
     }
 
