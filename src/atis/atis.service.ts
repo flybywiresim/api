@@ -95,7 +95,7 @@ export class AtisService {
                 source: 'IVAO',
                 combined: response.clients.atcs
                     .find((atc) => atc.callsign.includes(icao.toUpperCase()))
-                    .atis.lines.join(' '),
+                    ?.atis?.lines.join(' '),
             }))
             .catch((e) => {
                 throw this.generateNotAvailableException(e, icao);
