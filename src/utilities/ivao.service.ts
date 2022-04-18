@@ -2,7 +2,7 @@ import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { map, tap } from 'rxjs/operators';
 import { CacheService } from '../cache/cache.service';
 
-type Client = {
+interface Client {
     time: number;
     id: number;
     userId: number;
@@ -34,7 +34,7 @@ type Client = {
     createdAt: string;
 }
 
-type Server = {
+interface Server {
     id: string;
     hostname: string;
     ip: string;
@@ -44,7 +44,7 @@ type Server = {
     maximumConnections: number;
 }
 
-type Atis = {
+interface Atis {
     lines: string[];
     callsign: string;
     revision: number;
