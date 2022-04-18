@@ -23,7 +23,8 @@ export class IvaoService {
           this.logger.debug('Returning from cache');
           return cacheHit;
       }
-      const data = await this.http.get<Buffer>('https://api.ivao.aero/getdata/whazzup/whazzup.txt', { responseType: 'arraybuffer' })
+
+      const data: string = await this.http.get<Buffer>('https://api.ivao.aero/v2/tracker/whazzup/atis')
           .pipe(
               tap((response) => this.logger.debug(`Response status ${response.status} for IVAO  request`)),
               tap((response) => this.logger.debug(`Response contains ${response.data.length} entries`)),
@@ -32,7 +33,9 @@ export class IvaoService {
                   .split(/\r?\n/)),
           ).toPromise();
 
-      this.cache.set('/ivao/data', data, 120).then();
-      return data;
+      const parsedData = JSON.parse(data);
+
+      this.cache.set('/ivao/data', parsedData, 120).then();
+      return parsedData;
   }
 }
