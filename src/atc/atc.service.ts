@@ -51,13 +51,12 @@ export class AtcService {
         return atcs.map((atc) => ({
             callsign: atc.callsign,
             frequency: atc.atcSession.frequency.toString(),
-            textAtis: atc.atis.lines,
+            textAtis: atc.atis?.lines,
             latitude: atc.lastTrack.latitude,
             longitude: atc.lastTrack.longitude,
             type: this.callSignToAtcType(atc.callsign),
             visualRange: 4,
         }));
-        // return data.atcs.filter((c) => c.type !== AtcType.UNKNOWN);
     }
 
     public callSignToAtcType(callsign: string): AtcType {
