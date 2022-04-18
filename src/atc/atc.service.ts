@@ -6,7 +6,7 @@ import { IvaoService } from '../utilities/ivao.service';
 @Injectable()
 export class AtcService {
     constructor(private readonly vatsimService: VatsimService,
-                private readonly ivaoService: IvaoService) {}
+        private readonly ivaoService: IvaoService) { }
 
     public async getVatsimControllers(): Promise<ATCInfo[]> {
         const data = await this.vatsimService.fetchVatsimData();
@@ -46,64 +46,36 @@ export class AtcService {
     }
 
     public async getIvaoControllers(): Promise<ATCInfo[]> {
-        const data = await this.ivaoService.fetchIvaoData();
+        const { clients: { atcs } } = await this.ivaoService.fetchIvaoData();
 
-        const arr: ATCInfo[] = [];
-        for (const c of data) {
-            if (c.indexOf(':ATC:') > -1) {
-                const split = c.split(':');
-                if (split[0].indexOf('_') > -1) {
-                    const atisLine = data.find((x) => x.startsWith(`${split[0].split('_')[0]}_TWR`));
-                    const atis = atisLine?.split(':')[35]
-                        .split('^§')
-                        .slice(1)
-                        .join(' ')
-                        .toUpperCase();
-
-                    arr.push({
-                        callsign: split[0],
-                        frequency: split[4],
-                        textAtis: atis ? [atis] : null,
-                        visualRange: parseInt(split[19]),
-                        type: this.callSignToAtcType(split[0]),
-                        latitude: parseFloat(split[5]),
-                        longitude: parseFloat(split[6]),
-                    });
-                }
-            }
-        }
-
-        return arr.filter((c) => c.type !== AtcType.UNKNOWN);
+        return atcs.map((atc) => ({
+            callsign: atc.callsign,
+            frequency: atc.atcSession.frequency.toString(),
+            textAtis: atc.atis.lines,
+            latitude: atc.lastTrack.latitude,
+            longitude: atc.lastTrack.longitude,
+            type: this.callSignToAtcType(atc.callsign),
+            visualRange: 4,
+        }));
+        // return data.atcs.filter((c) => c.type !== AtcType.UNKNOWN);
     }
 
     public callSignToAtcType(callsign: string): AtcType {
-        if (callsign.indexOf('_CTR') > -1) {
-            return AtcType.RADAR;
+        switch (callsign.split('_').reverse()[0]) {
+        case 'CTR': return AtcType.RADAR;
+        case 'DEL': return AtcType.DELIVERY;
+        case 'GND': return AtcType.GROUND;
+        case 'DEP': return AtcType.DEPARTURE;
+        case 'TWR': return AtcType.TOWER;
+        case 'APP': return AtcType.APPROACH;
+        case 'ATIS': return AtcType.ATIS;
+        default: return AtcType.UNKNOWN;
         }
-        if (callsign.indexOf('_DEL') > -1) {
-            return AtcType.DELIVERY;
-        }
-        if (callsign.indexOf('_GND') > -1) {
-            return AtcType.GROUND;
-        }
-        if (callsign.indexOf('_DEP') > -1) {
-            return AtcType.DEPARTURE;
-        }
-        if (callsign.indexOf('_APP') > -1) {
-            return AtcType.APPROACH;
-        }
-        if (callsign.indexOf('_TWR') > -1) {
-            return AtcType.TOWER;
-        }
-        if (callsign.indexOf('_ATIS') > -1) {
-            return AtcType.ATIS;
-        }
-        return AtcType.UNKNOWN;
     }
 
-    public getFrequency(array:any[]):string {
+    public getFrequency(array: any[]): string {
         if (array && array.length > 0 && array[0].frequency) {
-            let freqInString : string = array[0].frequency.toString();
+            let freqInString: string = array[0].frequency.toString();
             freqInString = `${freqInString.substr(0, 3)}.${freqInString.substr(3)}`;
             return parseFloat(freqInString).toFixed(3);
         }
