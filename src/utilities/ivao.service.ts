@@ -102,14 +102,14 @@ export class IvaoService {
 
         const whazzupData: Whazzup = await this.http.get('https://api.ivao.aero/v2/tracker/whazzup')
             .pipe(
-                tap((response) => this.logger.debug(`Response status ${response.status} for IVAO  request`)),
-                tap((response) => this.logger.debug(`Response contains ${response.data.length} entries`)),
+                tap((response) => this.logger.debug(`Response status ${response.status} for IVAO whazzup request`)),
+                tap((response) => this.logger.debug(`Response contains ${response.data.servers.length} server entries`)),
                 map((response) => response.data),
             ).toPromise();
 
         const whazzupAtisData: WhazzupAtis = await this.http.get('https://api.ivao.aero/v2/tracker/whazzup/atis')
             .pipe(
-                tap((response) => this.logger.debug(`Response status ${response.status} for IVAO  request`)),
+                tap((response) => this.logger.debug(`Response status ${response.status} for IVAO whazzup-ATIS request`)),
                 tap((response) => this.logger.debug(`Response contains ${response.data.length} entries`)),
                 map((response) => response.data),
             ).toPromise();
