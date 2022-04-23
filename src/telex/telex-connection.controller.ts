@@ -2,7 +2,7 @@ import {
     Body, CacheInterceptor, CacheTTL,
     Controller,
     Delete,
-    Get, HttpException,
+    Get,
     Param,
     Post,
     Put,
@@ -85,8 +85,7 @@ export class TelexConnectionController {
   })
     getAllActiveConnections(@Query(new ValidationPipe({ transform: true })) pagination: PaginationDto,
                                 @Query(new ValidationPipe({ transform: true })) bounds: BoundsDto): Promise<PaginatedTelexConnectionDto> {
-        throw new HttpException('Endpoint temporarily disabled', 401);
-        // return this.telex.getActiveConnections(pagination, bounds);
+        return this.telex.getActiveConnections(pagination, bounds);
     }
 
   @Get('_find')
