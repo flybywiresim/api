@@ -105,7 +105,7 @@ spec:
               port: http
               scheme: HTTP
             initialDelaySeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 5
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
@@ -115,7 +115,7 @@ spec:
               port: http
               scheme: HTTP
             initialDelaySeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 5
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
