@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { MetarController } from './metar/metar.controller';
 import { MetarService } from './metar/metar.service';
@@ -26,6 +27,7 @@ import { IvaoService } from './utilities/ivao.service';
 import { GnssModule } from './gnss/gnss.module';
 import { CpdlcController } from './cpdlc/cpdlc.controller';
 import { CpdlcService } from './cpdlc/cpdlc.service';
+import { NotFoundExceptionFilter } from './utilities/not-found.filter';
 
 @Module({
     imports: [
@@ -124,7 +126,12 @@ import { CpdlcService } from './cpdlc/cpdlc.service';
         AtcController,
         CpdlcController,
     ],
-    providers: [MetarService, AtisService, TafService, VatsimService, IvaoService, AtcService, CpdlcService],
+    providers: [
+        {
+            provide: APP_FILTER,
+            useClass: NotFoundExceptionFilter,
+        },
+        MetarService, AtisService, TafService, VatsimService, IvaoService, AtcService, CpdlcService],
 })
 export class AppModule {
 }
