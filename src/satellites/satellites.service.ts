@@ -4,14 +4,14 @@ import { Observable } from 'rxjs';
 import { SatelliteInfo } from './dto/satellite-info.dto';
 
 @Injectable()
-export class GnssService {
-    private readonly logger = new Logger(GnssService.name);
+export class SatellitesService {
+    private readonly logger = new Logger(SatellitesService.name);
 
     constructor(private readonly http: HttpService) {
     }
 
-    public getGnssInfo(): Observable<SatelliteInfo[]> {
-        return this.http.get<any>('https://celestrak.com/NORAD/elements/gp.php?GROUP=gnss&FORMAT=json')
+    private getSatellitesInfo(group: string): Observable<SatelliteInfo[]> {
+        return this.http.get<any>(`https://celestrak.com/NORAD/elements/gp.php?GROUP=${group}&FORMAT=json`)
             .pipe(
                 tap((response) => this.logger.debug(`Response status ${response.status} for Celestrak request`)),
                 map((response) => response.data),
@@ -35,5 +35,13 @@ export class GnssService {
                     meanMotionDdot: info.MEAN_MOTION_DDOT,
                 }))),
             );
+    }
+
+    public getGnssInfo(): Observable<SatelliteInfo[]> {
+        return this.getSatellitesInfo('gnss');
+    }
+
+    public getIridiumInfo(): Observable<SatelliteInfo[]> {
+        return this.getSatellitesInfo('iridium');
     }
 }
