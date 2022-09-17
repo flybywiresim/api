@@ -28,6 +28,7 @@ import { GnssModule } from './gnss/gnss.module';
 import { CpdlcController } from './cpdlc/cpdlc.controller';
 import { CpdlcService } from './cpdlc/cpdlc.service';
 import { NotFoundExceptionFilter } from './utilities/not-found.filter';
+import { PosconService } from './utilities/poscon.service';
 
 @Module({
     imports: [
@@ -131,7 +132,7 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
             provide: APP_FILTER,
             useClass: NotFoundExceptionFilter,
         },
-        MetarService, AtisService, TafService, VatsimService, IvaoService, AtcService, CpdlcService],
+        MetarService, AtisService, TafService, VatsimService, IvaoService, PosconService, AtcService, CpdlcService],
 })
 export class AppModule {
 }

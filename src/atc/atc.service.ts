@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ATCInfo, AtcType } from './atc-info.class';
 import { VatsimService } from '../utilities/vatsim.service';
 import { IvaoService } from '../utilities/ivao.service';
+import { PosconService } from '../utilities/poscon.service';
 
 @Injectable()
 export class AtcService {
-    constructor(private readonly vatsimService: VatsimService,
-        private readonly ivaoService: IvaoService) { }
+    constructor(
+        private readonly vatsimService: VatsimService,
+        private readonly ivaoService: IvaoService,
+        private readonly posconService: PosconService,
+    ) {}
 
     public async getVatsimControllers(): Promise<ATCInfo[]> {
         const data = await this.vatsimService.fetchVatsimData();
@@ -58,6 +62,22 @@ export class AtcService {
             // TODO FIXME: visual range is not currently available in the new IVAO Whazzup v2 data
             visualRange: 100,
         }));
+    }
+
+    public async getPosconControllers(): Promise<ATCInfo[]> {
+        const data = await this.posconService.fetchPosconData();
+        const atc: ATCInfo[] = [];
+        data.atc.map((x): AtcType => {
+            const [latitude, longitude] = x.centerPoint;
+            return atc.push({
+                callsign: x.telephony,
+                frequency: x.vhfFreq,
+                type: this.callSignToAtcType(x.type),
+                latitude,
+                longitude,
+            });
+        });
+        return atc;
     }
 
     public callSignToAtcType(callsign: string): AtcType {

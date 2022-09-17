@@ -27,7 +27,7 @@ export class AtcController {
         description: 'The source for the atcs',
         example: 'vatsim',
         required: true,
-        enum: ['vatsim', 'ivao'],
+        enum: ['vatsim', 'ivao', 'poscon'],
     })
     @ApiOkResponse({ description: 'list of connected atc', type: [ATCInfo] })
     async getControllers(@Query('source') source?: string): Promise<ATCInfo[]> {
@@ -36,6 +36,10 @@ export class AtcController {
         }
         if (source === 'ivao') {
             return this.atcService.getIvaoControllers();
+        }
+
+        if (source === 'poscon') {
+            return this.atcService.getPosconControllers();
         }
         return null;
     }
