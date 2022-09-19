@@ -33,6 +33,8 @@ export class AtisService {
             return this.handleIvao(icaoCode);
         case 'pilotedge':
             return this.handlePilotEdge(icaoCode).toPromise();
+        case 'poscon':
+            return this.handlePOSCON(icaoCode).toPromise();
         }
     }
 
@@ -116,6 +118,24 @@ export class AtisService {
                     combined: response.data.text
                         .replace('\n\n', ' ')
                         .toUpperCase(),
+                })),
+                catchError((err) => {
+                    throw this.generateNotAvailableException(err, icao);
+                }),
+            );
+    }
+
+    private handlePOSCON(icao: string): Observable<Atis> {
+        return this.http
+            .get<any>(`https://services.poscon.com/atis/${icao}`)
+            .pipe(
+                tap((response) => this.logger.debug(
+                    `Response status ${response.status} for POSCON ATIS request`,
+                )),
+                map((response) => ({
+                    icao,
+                    source: 'POSCON',
+                    combined: response.data.atis.body,
                 })),
                 catchError((err) => {
                     throw this.generateNotAvailableException(err, icao);

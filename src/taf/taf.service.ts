@@ -28,6 +28,8 @@ export class TafService {
           return this.handleAviationWeather(icaoCode).toPromise();
       case 'faa':
           return this.handleFaa(icaoCode);
+      case 'poscon':
+          return this.handlePOSCON(icaoCode).toPromise();
       }
   }
 
@@ -86,6 +88,18 @@ export class TafService {
           .catch((e) => {
               throw this.generateNotAvailableException(e, icao);
           });
+  }
+
+  private handlePOSCON(icao: string): Observable<Taf> {
+      return this.http.get<any>(`https://services.poscon.com/taf/${icao}`)
+          .pipe(
+              tap((response) => this.logger.debug(`Response status ${response.status} for POSCON TAF request`)),
+              map((response) => ({
+                  icao,
+                  taf: response.data.taf,
+                  source: 'POSCON',
+              })),
+          );
   }
 
   private generateNotAvailableException(err: any, icao: string): HttpException {

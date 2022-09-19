@@ -18,7 +18,7 @@ export class AtisController {
       description: 'The source for the ICAO',
       example: 'faa',
       required: false,
-      enum: ['faa', 'vatsim', 'ivao', 'pilotedge'],
+      enum: ['faa', 'vatsim', 'ivao', 'pilotedge', 'poscon'],
   })
   @ApiOkResponse({ description: 'ATIS notice was found', type: Atis })
   @ApiNotFoundResponse({ description: 'ATIS not available for ICAO' })

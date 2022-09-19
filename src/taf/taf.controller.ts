@@ -13,7 +13,7 @@ export class TafController {
   @Get(':icao')
   @CacheTTL(120)
   @ApiParam({ name: 'icao', description: 'The ICAO of the airport to search for', example: 'KLAX' })
-  @ApiQuery({ name: 'source', description: 'The source for the TAF', example: 'faa', required: false, enum: ['aviationweather', 'faa'] })
+  @ApiQuery({ name: 'source', description: 'The source for the TAF', example: 'faa', required: false, enum: ['aviationweather', 'faa', 'poscon'] })
   @ApiOkResponse({ description: 'TAF notice was found', type: Taf })
   @ApiNotFoundResponse({ description: 'TAF not available for ICAO' })
     getForICAO(@Param('icao') icao: string, @Query('source') source?: string): Promise<Taf> {
