@@ -12,9 +12,6 @@ api:
     port: 25060
     database: fbw_api_prod
     user: fbw_api_prod
-    replicas:
-      - private-mysql-flybywiresim-do-user-8167919-0.b.db.ondigitalocean.com
-      - private-mysql-flybywiresim-read-only-83073-do-user-8167919-0.b.db.ondigitalocean.com
   redis:
     host: redis-prod-master.redis-prod.svc.cluster.local
   telex:
