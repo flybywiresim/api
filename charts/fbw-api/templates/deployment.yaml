@@ -60,8 +60,10 @@ spec:
               value: {{ .Values.api.database.logging }}
             - name: DATABASE_CONN_LIMIT
               value: {{ .Values.api.database.connectionLimit | quote }}
+            {{- if .Values.api.database.replicas }}
             - name: DATABASE_READ_ONLY_HOSTS
               value: {{ range .Values.api.database.replicas }}{{ . }};{{ end }}
+            {{- end }}
 
             # REDIS
             - name: REDIS_HOST
