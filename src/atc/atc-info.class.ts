@@ -15,14 +15,18 @@ export class ATCInfo {
   @ApiProperty({ description: 'The atc callsign', example: 'EBBR_TWR' })
   callsign: string;
 
+  telephony?: string;
+
   @ApiProperty({ description: 'The atc frequency', example: '128.800' })
   frequency: string;
 
+  vhfFreq?: string;
+
   @ApiProperty({ description: 'The atc visual range', example: 150 })
-  visualRange: number;
+  visualRange?: number;
 
   @ApiProperty({ description: 'The atc current ATIS', example: ['line 1', 'line2', 'line3'] })
-  textAtis: string[];
+  textAtis?: string[];
 
   @ApiProperty({ description: 'The atc type', example: 'GND' })
   type: AtcType;
