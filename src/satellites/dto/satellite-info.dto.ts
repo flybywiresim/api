@@ -51,4 +51,10 @@ export class SatelliteInfo {
 
     @ApiProperty()
     meanMotionDdot: number;
+
+    @ApiProperty()
+    tleLineOne: string;
+
+    @ApiProperty()
+    tleLineTwo: string;
 }
