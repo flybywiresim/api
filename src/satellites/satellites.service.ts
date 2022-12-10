@@ -10,8 +10,8 @@ export class SatellitesService {
     constructor(private readonly http: HttpService) {
     }
 
-    public getGnssInfo(): Observable<SatelliteInfo[]> {
-        return this.http.get<any>('https://celestrak.com/NORAD/elements/gp.php?GROUP=gnss&FORMAT=json')
+    public getSatellitesInfo(type: string): Observable<SatelliteInfo[]> {
+        return this.http.get<any>(`https://celestrak.com/NORAD/elements/gp.php?GROUP=${type}&FORMAT=json`)
             .pipe(
                 tap((response) => this.logger.debug(`Response status ${response.status} for Celestrak request`)),
                 map((response) => response.data),

@@ -1,5 +1,5 @@
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { CacheInterceptor, CacheTTL, Controller, Get, Logger, UseInterceptors } from '@nestjs/common';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL, Controller, Get, Logger, Query, UseInterceptors } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Cron } from '@nestjs/schedule';
 import { SatellitesService } from './satellites.service';
@@ -19,9 +19,16 @@ export class SatellitesController {
 
     @Get()
     @CacheTTL(3600) // 1h
-    @ApiOkResponse({ description: 'Satellite data for the GNSS constellation', type: [SatelliteInfo] })
-    getGnssInfo(): Observable<SatelliteInfo[]> {
-        return this.service.getGnssInfo();
+    @ApiQuery({
+        name: 'type',
+        description: 'The requested satellite type',
+        example: 'gnss',
+        required: true,
+        enum: ['gnss', 'iridium', 'iridium-NEXT', 'starlink', 'galileo', 'glo-ops', 'beidou', 'intelsat'],
+    })
+    @ApiOkResponse({ description: 'Satellite data for the requested type constellation', type: [SatelliteInfo] })
+    getGnssInfo(@Query('type') type: string): Observable<SatelliteInfo[]> {
+        return this.service.getSatellitesInfo(type);
     }
 
     @Cron('0 1 * * *')
