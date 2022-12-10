@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 import { SatelliteInfo } from './dto/satellite-info.dto';
 
 @Injectable()
-export class GnssService {
-    private readonly logger = new Logger(GnssService.name);
+export class SatellitesService {
+    private readonly logger = new Logger(SatellitesService.name);
 
     constructor(private readonly http: HttpService) {
     }

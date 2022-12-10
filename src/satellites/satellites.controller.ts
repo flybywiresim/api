@@ -2,18 +2,18 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL, Controller, Get, Logger, UseInterceptors } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Cron } from '@nestjs/schedule';
-import { GnssService } from './gnss.service';
+import { SatellitesService } from './satellites.service';
 import { SatelliteInfo } from './dto/satellite-info.dto';
 import { CacheService } from '../cache/cache.service';
 
-@ApiTags('GNSS')
-@Controller('api/v1/gnss')
+@ApiTags('Satellites')
+@Controller('api/v1/satellites')
 @UseInterceptors(CacheInterceptor)
-export class GnssController {
-    private readonly logger = new Logger(GnssController.name);
+export class SatellitesController {
+    private readonly logger = new Logger(SatellitesController.name);
 
     constructor(
-        private service: GnssService,
+        private service: SatellitesService,
         private cache: CacheService,
     ) {}
 
@@ -28,7 +28,7 @@ export class GnssController {
     async clearCache() {
         try {
             this.logger.log('Clearing GNSS cache');
-            await this.cache.del('/api/v1/gnss');
+            await this.cache.del('/api/v1/satellites');
         } catch (e) {
             this.logger.error(e);
         }
