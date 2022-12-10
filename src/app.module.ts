@@ -21,10 +21,11 @@ import { AirportModule } from './airport/airport.module';
 import { GitVersionsModule } from './git-versions/git-versions.module';
 import { ChartsModule } from './charts/charts.module';
 import { AtcController } from './atc/atc.controller';
+import { PilotsController } from './pilots/pilots.controller';
 import { VatsimService } from './utilities/vatsim.service';
 import { AtcService } from './atc/atc.service';
 import { IvaoService } from './utilities/ivao.service';
-import { GnssModule } from './gnss/gnss.module';
+import { SatellitesModule } from './satellites/satellites.module';
 import { CpdlcController } from './cpdlc/cpdlc.controller';
 import { CpdlcService } from './cpdlc/cpdlc.service';
 import { NotFoundExceptionFilter } from './utilities/not-found.filter';
@@ -116,7 +117,7 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
         AirportModule,
         GitVersionsModule,
         ChartsModule,
-        GnssModule,
+        SatellitesModule,
     ],
     controllers: [
         AppController,
@@ -124,6 +125,7 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
         AtisController,
         TafController,
         AtcController,
+        PilotsController,
         CpdlcController,
     ],
     providers: [
