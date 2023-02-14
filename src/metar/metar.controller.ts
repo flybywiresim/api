@@ -18,7 +18,7 @@ export class MetarController {
       description: 'The source for the METAR',
       example: 'vatsim',
       required: false,
-      enum: ['vatsim', 'ms', 'ivao', 'pilotedge'],
+      enum: ['vatsim', 'ms', 'ivao', 'pilotedge', 'poscon'],
   })
   @ApiOkResponse({ description: 'METAR notice was found', type: Metar })
   @ApiNotFoundResponse({ description: 'METAR not available for ICAO' })

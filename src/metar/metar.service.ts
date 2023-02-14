@@ -28,6 +28,8 @@ export class MetarService {
           return this.handleMs(icaoCode);
       case 'pilotedge':
           return this.handlePilotEdge(icaoCode).toPromise();
+      case 'poscon':
+          return this.handlePOSCON(icaoCode).toPromise();
       }
   }
 
@@ -109,6 +111,20 @@ export class MetarService {
           .pipe(
               tap((response) => this.logger.debug(`Response status ${response.status} for PilotEdge METAR request`)),
               map((response) => ({ icao, metar: response.data.metar, source: 'PilotEdge' })),
+              catchError(
+                  (err) => {
+                      throw this.generateNotAvailableException(err, icao);
+                  },
+              ),
+          );
+  }
+
+  // POSCON
+  private handlePOSCON(icao: string): Observable<Metar> {
+      return this.http.get<any>(`https://services.poscon.com/metar/${icao}`)
+          .pipe(
+              tap((response) => this.logger.debug(`Response status ${response.status} for POSCON METAR request`)),
+              map((response) => ({ icao, metar: response.data.metar, source: 'POSCON' })),
               catchError(
                   (err) => {
                       throw this.generateNotAvailableException(err, icao);
