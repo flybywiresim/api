@@ -74,14 +74,23 @@ export class AtisService {
     private handleVatsim(icao: string): Promise<Atis> {
         return this.vatsim
             .fetchVatsimData()
-            .then((response) => ({
-                icao,
-                source: 'Vatsim',
-                combined: response.atis
-                    .find((x) => x.callsign === `${icao}_ATIS`)
-                    .text_atis.join(' ')
-                    .toUpperCase(),
-            }))
+            .then((response) => {
+                const combined = response.atis.find((x) => x.callsign === `${icao}_ATIS`)?.text_atis.join(' ').toUpperCase();
+                const arr = response.atis.find((x) => x.callsign === `${icao}_A_ATIS`)?.text_atis.join(' ').toUpperCase();
+                const dep = response.atis.find((x) => x.callsign === `${icao}_D_ATIS`)?.text_atis.join(' ').toUpperCase();
+
+                if (combined === undefined && arr === undefined && dep === undefined) {
+                    throw new Error('No ATIS found');
+                }
+
+                return {
+                    icao,
+                    source: 'Vatsim',
+                    combined,
+                    arr,
+                    dep,
+                };
+            })
             .catch((e) => {
                 throw this.generateNotAvailableException(e, icao);
             });
