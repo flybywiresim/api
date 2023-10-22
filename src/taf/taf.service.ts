@@ -1,7 +1,6 @@
 import { HttpException, HttpService, Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import * as parser from 'fast-xml-parser';
 import { Taf } from './taf.class';
 import { CacheService } from '../cache/cache.service';
 
@@ -33,19 +32,19 @@ export class TafService {
 
   // AviationWeather
   private handleAviationWeather(icao: string): Observable<Taf> {
-      return this.http.get<any>(
-          'https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs'
-      + `&requestType=retrieve&format=xml&stationString=${icao}&hoursBeforeNow=0`,
+      return this.http.get<string>(
+          `https://aviationweather.gov/api/data/taf?ids=${icao}`,
+          { responseType: 'text' },
       )
           .pipe(
               tap((response) => this.logger.debug(`Response status ${response.status} for AviationWeather TAF request`)),
               map((response) => {
-                  const obj = parser.parse(response.data);
+                  const tafs = response.data.replace(/\s\s+/g, ' ').trimEnd().split('\n');
 
                   return {
                       source: 'AviationWeather',
                       icao,
-                      taf: obj.response.data.TAF[0].raw_text.toUpperCase(),
+                      taf: tafs.find((x) => x.startsWith(icao)).toUpperCase(),
                   };
               }),
               catchError(
