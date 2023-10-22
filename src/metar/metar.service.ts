@@ -28,6 +28,8 @@ export class MetarService {
           return this.handleMs(icaoCode);
       case 'pilotedge':
           return this.handlePilotEdge(icaoCode).toPromise();
+      case 'aviationweather':
+          return this.handleAviationWeather(icaoCode).toPromise();
       }
   }
 
@@ -109,6 +111,28 @@ export class MetarService {
           .pipe(
               tap((response) => this.logger.debug(`Response status ${response.status} for PilotEdge METAR request`)),
               map((response) => ({ icao, metar: response.data.metar, source: 'PilotEdge' })),
+              catchError(
+                  (err) => {
+                      throw this.generateNotAvailableException(err, icao);
+                  },
+              ),
+          );
+  }
+
+  // AviationWeather
+  private handleAviationWeather(icao: string): Observable<Metar> {
+      return this.http.get<string>(`https://aviationweather.gov/api/data/metar?hours=0&ids=${icao}`, { responseType: 'text' })
+          .pipe(
+              tap((response) => this.logger.debug(`Response status ${response.status} for AviationWeather METAR request`)),
+              map((response) => {
+                  const metars = response.data.replace(/[\s$]+$/g, '').split('\n');
+
+                  return ({
+                      source: 'AviationWeather',
+                      icao,
+                      metar: metars.find((x) => x.startsWith(icao)).toUpperCase()
+                  });
+              }),
               catchError(
                   (err) => {
                       throw this.generateNotAvailableException(err, icao);
