@@ -27,6 +27,12 @@ export default () => ({
         discordWebhook: process.env.TELEX_DISCORD_WEBHOOK || '',
     },
     auth: {
+        oauth: {
+            github: {
+                clientId: envOrFile('GITHUB_CLIENT_ID', './secrets/github_client_id.txt') || '',
+                secret: envOrFile('GITHUB_CLIENT_SECRET', './secrets/github_client_secret.txt') || '',
+            },
+        },
         secret: envOrFile('AUTH_SECRET', './secrets/jwt_secret.txt') || 'FlyByWire',
         expires: process.env.AUTH_EXPIRES || '12h',
     },
