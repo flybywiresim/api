@@ -53,30 +53,9 @@ export class MetarService {
           );
   }
 
-  // MS
-  async fetchMsBlob(): Promise<string[]> {
-      const cacheHit = await this.cache.get<string[]>('/metar/blob/ms');
-
-      if (cacheHit) {
-          this.logger.debug('Returning from cache');
-          return cacheHit;
-      }
-      const data = await this.http.get<string>('https://fsxweatherstorage.blob.core.windows.net/fsxweather/metars.bin')
-          .pipe(
-              tap((response) => this.logger.debug(`Response status ${response.status} for MS METAR request`)),
-              map((response) => response.data.split(/\r?\n/)),
-          ).toPromise();
-
-      this.cache.set('/metar/blob/ms', data, 240).then();
-      return data;
-  }
-
   private handleMs(icao: string): Promise<Metar> {
-      return this.fetchMsBlob()
-          .then((response) => ({ icao, metar: response.find((x) => x.startsWith(icao)), source: 'MS' }))
-          .catch((e) => {
-              throw this.generateNotAvailableException(e, icao);
-          });
+      // The FSX weather data stopped updating since NOAA switched their API in October 2023.
+      throw new HttpException(`METAR not available for ICAO: ${icao}`, 404);
   }
 
   // IVAO
@@ -130,7 +109,7 @@ export class MetarService {
                   return ({
                       source: 'AviationWeather',
                       icao,
-                      metar: metars.find((x) => x.startsWith(icao)).toUpperCase()
+                      metar: metars.find((x) => x.startsWith(icao)).toUpperCase(),
                   });
               }),
               catchError(
