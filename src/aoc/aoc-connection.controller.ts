@@ -1,5 +1,5 @@
 import { Body, CacheInterceptor, CacheTTL, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AocService } from './aoc.service';
 import { CreateAocConnectionDto } from './dto/create-aoc-connection.dto';
 import { FlightToken } from '../auth/flights/flight-token.class';
@@ -19,6 +19,12 @@ export class AocConnectionController {
     }
 
     @Post()
+    @ApiBody({
+        description: 'The new connection containing the flight number and current location',
+        type: CreateAocConnectionDto,
+    })
+    @ApiCreatedResponse({ description: 'An AOC connection got created', type: FlightToken })
+    @ApiBadRequestResponse({ description: 'An active flight with the given flight number is already in use' })
     addNewConnection(@Body() body: CreateAocConnectionDto): Promise<FlightToken> {
         return this.aoc.addNewConnection(body);
     }
