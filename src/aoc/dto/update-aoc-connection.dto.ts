@@ -3,11 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Point } from '../../utilities/point.entity';
 
 export class UpdateAocConnectionDto {
-    @IsOptional()
-    @IsNotEmpty()
-    @ApiProperty({ description: 'The flight number', example: 'OS355' })
-    flight: string;
-
     @IsNotEmpty()
     @ApiProperty({ description: 'The current location of the aircraft ' })
     location: Point;
