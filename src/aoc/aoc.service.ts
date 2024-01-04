@@ -40,6 +40,12 @@ export class AocService {
         this.logger.debug(`Set ${connections.affected} state connection to inactive`);
     }
 
+    async countActiveConnections(): Promise<number> {
+        this.logger.debug('Trying to get total number of active connections');
+
+        return this.connectionRepository.count({ isActive: true });
+    }
+
     async addNewConnection(connection: CreateAocConnectionDto): Promise<FlightToken> {
         this.logger.log(`Trying to register new AOC connection '${connection.flight}'`);
 
