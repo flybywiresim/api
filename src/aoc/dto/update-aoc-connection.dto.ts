@@ -17,11 +17,11 @@ export class UpdateAocConnectionDto {
 
     @IsOptional()
     @ApiProperty({ description: 'Whether the user wants to receive freetext messages', example: true })
-    freetextEnabled: boolean;
+    freetextEnabled: boolean = true;
 
     @IsOptional()
     @ApiProperty({ description: 'The aircraft type the connection associated with', example: 'A32NX' })
-    aircraftType = 'unknown';
+    aircraftType: string = 'unknown';
 
     @IsOptional()
     @ApiProperty({ description: 'The destination of the flgiht', example: 'KSFO', required: false })
