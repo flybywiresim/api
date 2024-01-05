@@ -8,6 +8,11 @@ import { CreateAocConnectionDto } from './dto/create-aoc-connection.dto';
 import { AuthService } from '../auth/auth.service';
 import { FlightToken } from '../auth/flights/flight-token.class';
 import { AocConnection } from './entities/aoc-connection.entity';
+import { PaginatedAocConnectionDto } from './dto/paginated-aoc-connection.dto';
+import { PaginationDto } from '../common/Pagination';
+import { BoundsDto } from '../common/Bounds';
+import { AocConnectionSearchResultDto } from './dto/aoc-connection-search-result.dto';
+import { UpdateAocConnectionDto } from './dto/update-aoc-connection.dto';
 
 @Injectable()
 export class AocService {
@@ -40,6 +45,60 @@ export class AocService {
         this.logger.debug(`Set ${connections.affected} state connection to inactive`);
     }
 
+    async getActiveConnections(pagination: PaginationDto, bounds: BoundsDto): Promise<PaginatedAocConnectionDto> {
+        this.logger.log(`Trying to get ${pagination.take} AOC connections, skipped ${pagination.skip}`);
+
+        const [results, total] = await this.connectionRepository
+            .createQueryBuilder()
+            .select()
+            .skip(pagination.skip)
+            .take(pagination.take)
+            .where({ isActive: true })
+            .andWhere(
+                `ST_Contains(ST_MakeEnvelope(ST_GeomFromText('POINT(${bounds.west} ${bounds.north})'),`
+                + ` ST_GeomFromText('Point(${bounds.east} ${bounds.south})')), location)`,
+            )
+            .orderBy('firstContact', 'ASC')
+            .getManyAndCount();
+
+        return {
+            results,
+            count: results.length,
+            total,
+        };
+    }
+
+    async getSingleConnection(id: string, active?: boolean): Promise<AocConnection> {
+        this.logger.log(`Trying to get single active AOC connection with ID '${id}'`);
+
+        const conn = await this.connectionRepository.findOne(id);
+        if (!conn || (active !== undefined && conn.isActive !== active)) {
+            const message = `${active ? 'Active f' : 'F'}light with ID '${id}' does not exist`;
+            this.logger.error(message);
+            throw new HttpException(message, 404);
+        }
+
+        return conn;
+    }
+
+    async findActiveConnectionByFlight(query: string): Promise<AocConnectionSearchResultDto> {
+        this.logger.log(`Trying to search for active AOC connections with flight number '${query}'`);
+
+        const matches = await this.connectionRepository
+            .createQueryBuilder()
+            .select()
+            .where(`UPPER(flight) LIKE UPPER('${query}%')`)
+            .andWhere('isActive = 1')
+            .orderBy('flight', 'ASC')
+            .limit(50)
+            .getMany();
+
+        return {
+            matches,
+            fullMatch: matches.find((x) => x.flight === query) ?? null,
+        };
+    }
+
     async countActiveConnections(): Promise<number> {
         this.logger.debug('Trying to get total number of active connections');
 
@@ -69,5 +128,36 @@ export class AocService {
         await this.connectionRepository.save(newFlight);
 
         return this.authService.registerFlight(newFlight.flight, newFlight.id);
+    }
+
+    async updateConnection(connectionId: string, connection: UpdateAocConnectionDto): Promise<AocConnection> {
+        this.logger.log(`Trying to update flight with ID '${connectionId}'`);
+
+        const change = await this.connectionRepository.update({ id: connectionId, isActive: true }, connection);
+
+        if (!change.affected) {
+            const message = `Active flight with ID '${connectionId}' does not exist`;
+            this.logger.error(message);
+            throw new HttpException(message, 404);
+        }
+
+        this.logger.log(`Updated flight with id '${connectionId}'`);
+        return this.connectionRepository.findOne(connectionId);
+    }
+
+    async disableConnection(connectionId: string): Promise<void> {
+        this.logger.log(`Trying to disable TELEX connection with ID '${connectionId}'`);
+
+        const existingFlight = await this.connectionRepository.findOne({ id: connectionId, isActive: true });
+
+        if (!existingFlight) {
+            const message = `Active flight with ID '${connectionId}' does not exist`;
+            this.logger.error(message);
+            throw new HttpException(message, 404);
+        }
+
+        this.logger.log(`Disabling flight with ID '${connectionId}'`);
+
+        await this.connectionRepository.update(existingFlight.id, { isActive: false });
     }
 }
