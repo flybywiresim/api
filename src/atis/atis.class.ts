@@ -17,9 +17,21 @@ export class Atis {
   })
   combined?: string;
 
+  @ApiProperty({
+      description: 'The combined ATIS code',
+      example: 'V',
+  })
+  combinedCode?: string;
+
   @ApiProperty({ description: 'The arrival ATIS notice' })
   arr?: string;
 
+  @ApiProperty({ description: 'The arrival ATIS code' })
+  arrCode?: string;
+
   @ApiProperty({ description: 'The departure ATIS notice' })
   dep?: string;
+
+  @ApiProperty({ description: 'The departure ATIS code' })
+  depCode?: string;
 }

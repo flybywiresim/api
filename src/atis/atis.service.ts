@@ -56,12 +56,9 @@ export class AtisService {
                 };
 
                 response.data.forEach((x) => {
-                    atis[x.type] = x.datis;
+                    atis[x.type] = x.datis.toUpperCase();
+                    atis[`${x.type}Code`] = x.code.toUpperCase(); 
                 });
-
-                atis.dep?.toUpperCase();
-                atis.arr?.toUpperCase();
-                atis.combined?.toUpperCase();
 
                 return atis;
             }),
@@ -76,8 +73,11 @@ export class AtisService {
             .fetchVatsimData()
             .then((response) => {
                 const combined = response.atis.find((x) => x.callsign === `${icao}_ATIS`)?.text_atis.join(' ').toUpperCase();
+                const combinedCode = response.atis.find((x) => x.callsign === `${icao}_ATIS`)?.atis_code.toUpperCase();
                 const arr = response.atis.find((x) => x.callsign === `${icao}_A_ATIS`)?.text_atis.join(' ').toUpperCase();
+                const arrCode = response.atis.find((x) => x.callsign === `${icao}_A_ATIS`)?.atis_code.toUpperCase();
                 const dep = response.atis.find((x) => x.callsign === `${icao}_D_ATIS`)?.text_atis.join(' ').toUpperCase();
+                const depCode = response.atis.find((x) => x.callsign === `${icao}_D_ATIS`)?.atis_code.toUpperCase();
 
                 if (combined === undefined && arr === undefined && dep === undefined) {
                     throw new Error('No ATIS found');
@@ -87,8 +87,11 @@ export class AtisService {
                     icao,
                     source: 'Vatsim',
                     combined,
+                    combinedCode,
                     arr,
+                    arrCode,
                     dep,
+                    depCode,
                 };
             })
             .catch((e) => {
@@ -105,6 +108,9 @@ export class AtisService {
                 combined: response.clients.atcs
                     .find((atc) => atc.callsign.includes(icao.toUpperCase()))
                     ?.atis?.lines.join(' '),
+                combinedCode: response.clients.atcs
+                    .find((atc) => atc.callsign.includes(icao.toUpperCase()))
+                    ?.atis?.revision.toUpperCase(),
             }))
             .catch((e) => {
                 throw this.generateNotAvailableException(e, icao);
@@ -121,10 +127,11 @@ export class AtisService {
                 )),
                 map((response) => ({
                     icao,
-                    source: 'FAA',
+                    source: 'PilotEdge',
                     combined: response.data.text
                         .replace('\n\n', ' ')
                         .toUpperCase(),
+                    combinedCode: response.data.letter.toUpperCase(),
                 })),
                 catchError((err) => {
                     throw this.generateNotAvailableException(err, icao);
