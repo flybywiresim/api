@@ -26,6 +26,10 @@ export default () => ({
         timeoutMin: parseInt(process.env.TELEX_TIMEOUT_MIN) || 6,
         discordWebhook: process.env.TELEX_DISCORD_WEBHOOK || '',
     },
+    aoc: {
+        disableCleanup: envBool('AOC_DISABLE_CLEANUP', true),
+        timeoutMin: parseInt(process.env.AOC_TIMEOUT_MIN) || 6,
+    },
     auth: {
         secret: envOrFile('AUTH_SECRET', './secrets/jwt_secret.txt') || 'FlyByWire',
         expires: process.env.AUTH_EXPIRES || '12h',
