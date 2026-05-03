@@ -47,7 +47,7 @@ interface Server {
 interface Atis {
     lines: string[];
     callsign: string;
-    revision: number;
+    revision: string;
     timestamp: string;
     sessionId: number;
 }
