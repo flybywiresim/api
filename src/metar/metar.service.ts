@@ -104,12 +104,18 @@ export class MetarService {
           .pipe(
               tap((response) => this.logger.debug(`Response status ${response.status} for AviationWeather METAR request`)),
               map((response) => {
-                  const metars = response.data.replace(/[\s$]+$/g, '').split('\n');
+                  const metar = response.data.replace(/[\s$]+$/g, '').split(/\r?\n/)
+                      .map((report) => report.trim().toUpperCase().replace(/^(?:METAR|SPECI)\s+/, ''))
+                      .find((report) => report.startsWith(`${icao} `));
+
+                  if (!metar) {
+                      throw new Error(`No matching METAR for ICAO: ${icao}`);
+                  }
 
                   return ({
                       source: 'AviationWeather',
                       icao,
-                      metar: metars.find((x) => x.startsWith(icao)).toUpperCase(),
+                      metar,
                   });
               }),
               catchError(
