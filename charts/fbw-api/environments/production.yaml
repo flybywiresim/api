@@ -12,6 +12,34 @@ api:
     port: 25060
     database: fbw_api_prod
     user: fbw_api_prod
+    ssl:
+      enabled: false
+      ca: |
+        -----BEGIN CERTIFICATE-----
+        MIIEQTCCAqmgAwIBAgIUCED5cWJL2FCrW5yWUTT/aCrHCkIwDQYJKoZIhvcNAQEM
+        BQAwOjE4MDYGA1UEAwwvZDg3ZjliMDUtOTQ4ZS00NWFjLTkxMGYtNDQwMTQ4ZDUz
+        ODQwIFByb2plY3QgQ0EwHhcNMjAxMTIwMjIzMTU1WhcNMzAxMTE4MjIzMTU1WjA6
+        MTgwNgYDVQQDDC9kODdmOWIwNS05NDhlLTQ1YWMtOTEwZi00NDAxNDhkNTM4NDAg
+        UHJvamVjdCBDQTCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBAK8OYs5J
+        6bIFXld9RfQztUqbGmPEJpltCwC6ziuJiiBsGUdy7UMD7Z4e6BACTrHVwWEFO4XU
+        +lC2mPU9Jw+hyiOnW5m097Xw8EXJa4MuFoEHPcRbxvZgF9hE1odF0qXNAE9kKyO2
+        //qS70mx9KW33qXLrAMMh/0atfO+4l7k4AHXHHWm2dl87vo9AsLCQqnq1Xi8ULga
+        LWNpMNA4rK+H0Cy35WhDISKfxCjT3nfiTR1ZQ4+ojG1KO5jWeBLrohDWSJuTaIbt
+        VzL6FntYJ7JKvSETqv2cwW1DKl1WAGgrqCz1mpxYymAxz415WOP60yCRcNpFSl7q
+        xJJVaIGByqgxEJAKGTNWMKYPAS6hN4Lsm+HyYz41k5NJ5AvPggLBnidITixG9MFS
+        9mEZlwVhLyXgju3jYveiMagSNEnGMvKFH+OpE+Yj1vNTu1wvB3SZFjV/s1FcBbyN
+        V4yUVzZ7D4xxJJx4YtDCNJcf03MhwfBIGHl3ugR3QtJiHBopZ/r0fhzDPwIDAQAB
+        oz8wPTAdBgNVHQ4EFgQUmE6QuBVSnwTdGM0QO1icKQC8N40wDwYDVR0TBAgwBgEB
+        /wIBADALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQEMBQADggGBAG9u8SwjEu1tAeWu
+        j55knAtzVwBRUZtYoMWjRZZXwRR6UXj2FMvkTP3+RcxWqZ39ePSRPYa2te8/dmSY
+        k0rWlGjj1mxqpQX1xC1ANWEQSOw8JXMi6RGIGqUQjQDL9ewGZKBaotfzKQhxfT4B
+        SuGRNKV63BxaAd689MYyIKQX7MJHYLewWNMX14IgMXWWtNa41+rxAKvZXr9IJnOv
+        Fl4GB33CZmUnggPGDYBLhJNpk09/WgC57rv8P0JugoQ/7Fa/WhwkoSQyqT3blELi
+        DAPJr5HxdsEh2pWo4dwouhBExa1ZI4VAYoIZYxqafPdoRsX6CXHSAty6OiFTnHsH
+        +01gbBhPyrRMcAPLzSwhf25evIUEWpBLayxDzzeeROEE4xoR2tE0qz05whTCL+zd
+        1zWkS2vW1pb4H8lFLy8rXEtJo+29YLSQAswA65t+Xu6tJcIqjXKDngmaeuO/nOof
+        pLwbQUKRrwuN++oED/Y5CO7PWhZ0u19mIxB+9Nq/xQDDOKx0Og==
+        -----END CERTIFICATE-----
   redis:
     host: redis-prod-master.redis-prod.svc.cluster.local
   telex:

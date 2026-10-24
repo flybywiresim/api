@@ -64,6 +64,13 @@ spec:
             - name: DATABASE_READ_ONLY_HOSTS
               value: {{ range .Values.api.database.replicas }}{{ . }};{{ end }}
             {{- end }}
+            {{- $ssl := .Values.api.database.ssl | default dict }}
+            {{- if $ssl.enabled }}
+            - name: DATABASE_SSL
+              value: "true"
+            - name: DATABASE_SSL_CA
+              value: {{ required "api.database.ssl.ca is required when api.database.ssl.enabled is true" $ssl.ca | toJson }}
+            {{- end }}
 
             # REDIS
             - name: REDIS_HOST
