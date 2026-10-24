@@ -66,6 +66,7 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
                         legacySpatialSupport: false,
                         namingStrategy: new FbwNamingStrategy(),
                         logging: configService.get('database.logging'),
+                        charset: 'UTF8_GENERAL_CI',
                         extra: { connectionLimit: configService.get<number>('database.connectionLimit') },
                     };
                 }
@@ -82,6 +83,7 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
                     legacySpatialSupport: false,
                     namingStrategy: new FbwNamingStrategy(),
                     logging: configService.get('database.logging'),
+                    charset: 'UTF8_GENERAL_CI',
                     extra: { connectionLimit: configService.get<number>('database.connectionLimit') },
                 };
             },
