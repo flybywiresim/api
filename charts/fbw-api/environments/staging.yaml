@@ -11,7 +11,7 @@ api:
     database: fbw_api_staging
     user: fbw_api_staging
     ssl:
-      enabled: false
+      enabled: true
       ca: |
         -----BEGIN CERTIFICATE-----
         MIIEQTCCAqmgAwIBAgIUCED5cWJL2FCrW5yWUTT/aCrHCkIwDQYJKoZIhvcNAQEM
