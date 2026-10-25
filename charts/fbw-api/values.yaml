@@ -31,6 +31,9 @@ api:
     logging: error
     connectionLimit: 5
     replicas: []
+    ssl:
+      enabled: false
+      ca: ~
   redis:
     host: ~
     port: 6379

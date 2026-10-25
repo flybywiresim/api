@@ -41,6 +41,12 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
                 const database = configService.get('database.database');
                 const port = configService.get<number>('database.port');
                 const replicas = configService.get<string>('database.replicas').split(';').filter((x) => x !== '');
+                const sslCa = configService.get<string>('database.sslCa');
+
+                if (configService.get<boolean>('database.ssl') && !sslCa) {
+                    throw new Error('DATABASE_SSL is true, but no CA is set in DATABASE_SSL_CA or DATABASE_SSL_CA_FILE');
+                }
+                const ssl = configService.get<boolean>('database.ssl') ? { ca: sslCa } : undefined;
 
                 if (replicas.length > 0) {
                     return {
@@ -66,6 +72,8 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
                         legacySpatialSupport: false,
                         namingStrategy: new FbwNamingStrategy(),
                         logging: configService.get('database.logging'),
+                        charset: 'UTF8_GENERAL_CI',
+                        ssl,
                         extra: { connectionLimit: configService.get<number>('database.connectionLimit') },
                     };
                 }
@@ -82,6 +90,8 @@ import { NotFoundExceptionFilter } from './utilities/not-found.filter';
                     legacySpatialSupport: false,
                     namingStrategy: new FbwNamingStrategy(),
                     logging: configService.get('database.logging'),
+                    charset: 'UTF8_GENERAL_CI',
+                    ssl,
                     extra: { connectionLimit: configService.get<number>('database.connectionLimit') },
                 };
             },
