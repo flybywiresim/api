@@ -13,7 +13,7 @@ api:
     database: fbw_api_prod
     user: fbw_api_prod
     ssl:
-      enabled: false
+      enabled: true
       ca: |
         -----BEGIN CERTIFICATE-----
         MIIEQTCCAqmgAwIBAgIUCED5cWJL2FCrW5yWUTT/aCrHCkIwDQYJKoZIhvcNAQEM
