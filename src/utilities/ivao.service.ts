@@ -26,11 +26,11 @@ interface Client {
         timestamp: string;
         transponder: number;
         transponderMode: string;
-    };
+    } | null;
     atcSession: {
         frequency: number;
         position: string;
-    };
+    } | null;
     createdAt: string;
 }
 

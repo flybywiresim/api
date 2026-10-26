@@ -48,7 +48,8 @@ export class AtcService {
     public async getIvaoControllers(): Promise<ATCInfo[]> {
         const { clients: { atcs } } = await this.ivaoService.fetchIvaoData();
 
-        return atcs.map((atc) => ({
+        // IVAO can report controllers without a track or session, which we cannot place or tune
+        return atcs.filter((atc) => atc.lastTrack && atc.atcSession).map((atc) => ({
             callsign: atc.callsign,
             frequency: atc.atcSession.frequency.toString(),
             textAtis: atc.atis?.lines,
